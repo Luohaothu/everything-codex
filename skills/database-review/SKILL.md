@@ -44,6 +44,7 @@ You are an expert PostgreSQL database specialist focused on query optimization, 
 ## Key Patterns
 
 ### Index Types
+
 | Type | Use Case |
 |------|----------|
 | B-tree (default) | Equality, range queries |

@@ -67,31 +67,40 @@ for lang in golang python typescript; do
 done
 
 # 3. Skills → ~/.agents/skills/
+# Track only files we install (not pre-existing user files)
 mkdir -p "$AGENTS_SKILLS_DIR"
+: > "$INSTALL_MANIFEST"
 echo "Installing skills..."
 for skill_dir in "$PROJECT_DIR"/skills/*/; do
     skill_name=$(basename "$skill_dir")
     target="$AGENTS_SKILLS_DIR/$skill_name"
     mkdir -p "$target"
-    cp -r "$skill_dir"* "$target/"
+    for src_file in $(find "$skill_dir" -type f); do
+        rel="${src_file#"$skill_dir"}"
+        dest="$target/$rel"
+        mkdir -p "$(dirname "$dest")"
+        cp "$src_file" "$dest"
+        echo "$dest" >> "$INSTALL_MANIFEST"
+    done
 done
 echo "Installed $(ls -d "$PROJECT_DIR"/skills/*/ | wc -l | tr -d ' ') skills"
 
 # 4. Rules → ~/.codex/rules/
 mkdir -p "$CODEX_DIR/rules"
-cp "$PROJECT_DIR"/rules/*.rules "$CODEX_DIR/rules/"
+for rules_file in "$PROJECT_DIR"/rules/*.rules; do
+    dest="$CODEX_DIR/rules/$(basename "$rules_file")"
+    cp "$rules_file" "$dest"
+    echo "$dest" >> "$INSTALL_MANIFEST"
+done
 echo "Installed execution policy rules"
 
 # 5. Config examples
 cp "$PROJECT_DIR/config.toml" "$CODEX_DIR/config.toml.example"
+echo "$CODEX_DIR/config.toml.example" >> "$INSTALL_MANIFEST"
 echo "Installed config.toml.example"
 
-# 6. Install manifest
-: > "$INSTALL_MANIFEST"
-find "$AGENTS_SKILLS_DIR" -type f >> "$INSTALL_MANIFEST"
-find "$CODEX_DIR/rules" -name "*.rules" -type f >> "$INSTALL_MANIFEST"
-echo "$CODEX_DIR/config.toml.example" >> "$INSTALL_MANIFEST"
-echo "Manifest written to $INSTALL_MANIFEST"
+# 6. Finalize manifest
+echo "Manifest written to $INSTALL_MANIFEST ($(wc -l < "$INSTALL_MANIFEST" | tr -d ' ') files)"
 
 # 7. Post-install verification
 echo ""
