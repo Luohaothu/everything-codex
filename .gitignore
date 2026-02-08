@@ -30,3 +30,6 @@ examples/sessions/*.tmp
 
 # Local drafts
 marketing/
+
+# Git worktrees
+.worktrees/
