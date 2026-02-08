@@ -1,7 +1,7 @@
 # everything-codex
 
-[![Stars](https://img.shields.io/github/stars/affaan-m/everything-codex?style=flat)](https://github.com/affaan-m/everything-codex/stargazers)
-[![Forks](https://img.shields.io/github/forks/affaan-m/everything-codex?style=flat)](https://github.com/affaan-m/everything-codex/network/members)
+[![Stars](https://img.shields.io/github/stars/Luohaothu/everything-codex?style=flat)](https://github.com/Luohaothu/everything-codex/stargazers)
+[![Forks](https://img.shields.io/github/forks/Luohaothu/everything-codex?style=flat)](https://github.com/Luohaothu/everything-codex/network/members)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Shell](https://img.shields.io/badge/-Shell-4EAA25?logo=gnu-bash&logoColor=white)
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?logo=markdown&logoColor=white)
@@ -20,7 +20,7 @@ Production-ready skills, execution policies, AGENTS.md templates, and structured
 
 ```bash
 # 1. Clone
-git clone https://github.com/affaan-m/everything-codex.git
+git clone https://github.com/Luohaothu/everything-codex.git
 cd everything-codex
 
 # 2. Install
@@ -341,7 +341,7 @@ The instinct-based learning system automatically captures your patterns:
 ### Automated (Recommended)
 
 ```bash
-git clone https://github.com/affaan-m/everything-codex.git
+git clone https://github.com/Luohaothu/everything-codex.git
 cd everything-codex
 ./scripts/install.sh
 ```
@@ -358,7 +358,7 @@ The installer:
 ### Manual
 
 ```bash
-git clone https://github.com/affaan-m/everything-codex.git
+git clone https://github.com/Luohaothu/everything-codex.git
 
 # Copy AGENTS.md
 cp everything-codex/AGENTS.md ~/.codex/AGENTS.md
@@ -445,7 +445,7 @@ These configs work for the maintainer's workflow. You should:
 
 ## Background
 
-These configurations are the result of 10+ months of intensive daily use building real products. Originally developed as [everything-claude-code](https://github.com/affaan-m/everything-claude-code), now refactored to target the [OpenAI Codex CLI](https://github.com/openai/codex).
+These configurations are the result of 10+ months of intensive daily use building real products. Originally developed as [everything-claude-code](https://github.com/affaan-m/everything-claude-code) by affaan-m, now refactored to target the [OpenAI Codex CLI](https://github.com/openai/codex). This fork is maintained at [Luohaothu/everything-codex](https://github.com/Luohaothu/everything-codex).
 
 ---
 
