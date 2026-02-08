@@ -1,8 +1,12 @@
 {
-  "devDependencies": {
-    "@eslint/js": "^9.39.2",
-    "eslint": "^9.39.2",
-    "globals": "^17.1.0",
-    "markdownlint-cli": "^0.47.0"
+  "name": "everything-codex",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Codex-first engineering template with skills, workflows, and validation gates.",
+  "scripts": {
+    "validate": "node scripts/ci/validate-agents.js && node scripts/ci/validate-hooks.js && node scripts/ci/validate-commands.js && node scripts/ci/validate-skills.js && node scripts/ci/validate-rules.js",
+    "test": "node tests/run-all.js",
+    "lint": "node scripts/ci/lint-js.js && node scripts/ci/lint-md.js",
+    "verify": "npm run validate && npm run test && npm run lint"
   }
 }

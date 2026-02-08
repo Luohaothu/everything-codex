@@ -1,17 +1,15 @@
-## Description
-<!-- Brief description of changes -->
+## Summary
 
-## Type of Change
-- [ ] `fix:` Bug fix
-- [ ] `feat:` New feature
-- [ ] `refactor:` Code refactoring
-- [ ] `docs:` Documentation
-- [ ] `test:` Tests
-- [ ] `chore:` Maintenance/tooling
-- [ ] `ci:` CI/CD changes
+Describe the change and why it is needed.
+
+## Validation
+
+- [ ] `npm run validate`
+- [ ] `npm run test`
+- [ ] `npm run lint`
 
 ## Checklist
-- [ ] Tests pass locally (`node tests/run-all.js`)
-- [ ] Validation scripts pass
-- [ ] Follows conventional commits format
-- [ ] Updated relevant documentation
+
+- [ ] Scope is focused and minimal.
+- [ ] Docs updated (`README.md`, `README.zh-CN.md`, or `docs/` when relevant).
+- [ ] No Claude/OpenCode-specific files were introduced.

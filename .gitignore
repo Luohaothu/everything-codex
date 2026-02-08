@@ -3,33 +3,33 @@
 .env.local
 .env.*.local
 
-# API keys
+# Secrets
 *.key
 *.pem
 secrets.json
 
-# OS files
+# Node
+node_modules/
+
+# OS/editor
 .DS_Store
 Thumbs.db
-
-# Editor files
 .idea/
 .vscode/
 *.swp
 *.swo
 
-# Node
-node_modules/
-
-# Personal configs (if any)
+# Local scratch
 personal/
 private/
-
-# Session templates (not committed)
-examples/sessions/*.tmp
-
-# Local drafts
 marketing/
-
-# Git worktrees
 .worktrees/
+
+# Codex local state
+.codex/sessions/
+.codex/cache/
+
+# Legacy platform dirs (not used in this repo)
+.claude/
+.claude-plugin/
+.opencode/
