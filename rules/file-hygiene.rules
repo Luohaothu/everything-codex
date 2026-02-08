@@ -1,0 +1,13 @@
+# File hygiene rules
+
+# Recursive force delete is too dangerous
+prefix_rule(
+    pattern=["rm", "-rf"],
+    decision="forbidden",
+    justification="Recursive force delete is too dangerous"
+)
+prefix_rule(
+    pattern=["rm", "-r"],
+    decision="prompt",
+    justification="Recursive delete requires confirmation"
+)
