@@ -1,6 +1,6 @@
-# Example Project CLAUDE.md
+# Example Project AGENTS.md
 
-This is an example project-level CLAUDE.md file. Place this in your project root.
+This is an example project-level AGENTS.md file. Place this in your project root to provide project-specific instructions to Codex CLI.
 
 ## Project Overview
 
@@ -17,7 +17,6 @@ This is an example project-level CLAUDE.md file. Place this in your project root
 
 ### 2. Code Style
 
-- No emojis in code, comments, or documentation
 - Immutability always - never mutate objects or arrays
 - No console.log in production code
 - Proper error handling with try/catch
@@ -37,7 +36,6 @@ This is an example project-level CLAUDE.md file. Place this in your project root
 - Environment variables for sensitive data
 - Validate all user inputs
 - Parameterized queries only
-- CSRF protection enabled
 
 ## File Structure
 
@@ -62,18 +60,6 @@ interface ApiResponse<T> {
 }
 ```
 
-### Error Handling
-
-```typescript
-try {
-  const result = await operation()
-  return { success: true, data: result }
-} catch (error) {
-  console.error('Operation failed:', error)
-  return { success: false, error: 'User-friendly message' }
-}
-```
-
 ## Environment Variables
 
 ```bash
@@ -85,12 +71,12 @@ API_KEY=
 DEBUG=false
 ```
 
-## Available Commands
+## Available Skills
 
 - `/tdd` - Test-driven development workflow
 - `/plan` - Create implementation plan
 - `/code-review` - Review code quality
-- `/build-fix` - Fix build errors
+- `/verify` - Run verification checks
 
 ## Git Workflow
 
