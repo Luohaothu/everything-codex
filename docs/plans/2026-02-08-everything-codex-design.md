@@ -8,6 +8,26 @@
 - 不采用实验性 MCP subagent（不稳定）
 - 13 个 agents 降级为 skills（role-switching prompt 模式）
 - **充分利用 Codex 原生 rules 体系**：AGENTS.md 层级指令 + Starlark execution policies 双轨制
+- **分阶段迁移**：先 MVP 关键路径验证，再逐步扩大迁移面
+
+### 迁移策略：分阶段 + 强门禁
+
+**MVP Gate（必须先完成，阻断后续所有阶段）**：
+1. AGENTS.md 分层加载可验证 — 全局 + 项目级正确加载
+2. rules/execpolicy 生效可验证 — 高危命令被正确拦截
+3. `codex --check-config` 与 profile 启动可验证 — config.toml 无报错
+4. skills 可发现且关键命令可触发 — `/plan`、`/code-review`、`/tdd`
+
+**阶段划分**：
+| 阶段 | 范围 | Gate 条件 | 依赖 |
+|------|------|-----------|------|
+| **Stage 0: 基础设施** | Phase 1（AGENTS.md + rules + config） | MVP Gate 全部通过 | 无 |
+| **Stage 1: 核心 Skills** | Phase 2 中的 4 个关键 agent-skills：`plan`、`code-review`、`tdd`、`security-review` | 端到端 smoke test 通过 | Stage 0 |
+| **Stage 2: 剩余 Agent-Skills** | Phase 2 剩余 9 个 + Phase 3 commands | Skill 发现 + 触发测试 | Stage 1 |
+| **Stage 3: Pattern Skills** | Phase 4（29 个现有 skills 迁移） | frontmatter 验证 + 无 Claude Code 引用 | Stage 1 |
+| **Stage 4: 安装与发布** | Phase 7 安装脚本 + Phase 8 文档 | 安装/卸载/回滚端到端测试 | Stage 2 + 3 |
+
+每个阶段完成后执行对应 gate 检查，失败则修复后重新验证，不得跳过。
 
 ### Codex Rules 体系总结
 
@@ -92,7 +112,7 @@ Codex 有两个互补的规则系统：
     └── AGENTS.md          # TypeScript 特定规则
 ```
 
-> 当用户在 Go 项目中工作时，Codex 自动加载 `~/.codex/AGENTS.md`（全局）+ 项目级 `AGENTS.md`（如有）。语言特定规则通过 skills 按需加载（见 Phase 4）。
+当用户在 Go 项目中工作时，Codex 自动加载 `~/.codex/AGENTS.md`（全局）+ 项目级 `AGENTS.md`（如有）。语言特定规则通过 skills 按需加载（见 Phase 4）。
 
 **注意**：Codex 的 AGENTS.md 层级发现基于工作目录路径，不是按语言检测。因此语言特定的 AGENTS.md 只在用户处于对应子目录时自动生效。对于项目级使用，更实际的方案是：
 
@@ -100,9 +120,40 @@ Codex 有两个互补的规则系统：
 - **项目 AGENTS.md**：用户根据项目语言从模板中选择内容
 - **语言特定规则 skills**：按需加载，作为 AGENTS.md 的补充
 
+#### 语言规则加载兜底机制
+
+为解决路径不匹配导致语言规则失效的问题，采用三层兜底策略：
+
+1. **全局 AGENTS.md 中嵌入语言检测提示**：在全局 AGENTS.md 末尾添加指令，提示 agent 根据当前文件扩展名主动加载对应语言 skill（如检测到 `.go` 文件时建议 `/golang-rules`）
+2. **`/configure-codex` 安装时按项目语言生成**：安装脚本检测项目主语言（通过 `go.mod`、`pyproject.toml`、`package.json` 等标志文件），自动将对应语言规则合并进项目级 AGENTS.md
+3. **语言 skills 作为最终兜底**：即使 AGENTS.md 未加载语言规则，用户仍可手动 `/golang-rules` 等触发加载
+
 ### 1.3 Execution Policy Rules（Starlark）
 
-将安全类 hooks 转换为 Starlark 执行策略：
+将安全类 hooks 转换为 Starlark 执行策略，建立系统性危险命令矩阵，覆盖直接命令、复合命令、管道、子 shell、分号链等绕过路径。
+
+#### 高危命令矩阵
+
+| 类别 | 命令模式 | 决策 | 绕过风险 |
+|------|---------|------|---------|
+| 文件删除 | `rm -rf`, `rm -r` | forbidden | 管道 `\| xargs rm`、子 shell `$(rm ...)` |
+| Git 破坏 | `git push --force`, `git reset --hard`, `git clean -f` | forbidden | `--force-with-lease` 应 prompt |
+| Git 推送 | `git push` | prompt | — |
+| 长进程 | `npm run dev`, `pnpm dev`, `yarn dev` | prompt | `npx` 包装 |
+| 权限提升 | `sudo`, `su` | forbidden | 管道 `\| sudo` |
+| 网络工具 | `curl \| bash`, `wget -O- \| sh` | forbidden | 变体：`curl \| sh`, `wget \| bash` |
+| 数据库破坏 | `DROP TABLE`, `DROP DATABASE`, `TRUNCATE` | forbidden | 通过 `psql -c` 或 `mysql -e` 执行 |
+
+#### 反绕过验证要求
+
+安装后必须通过以下测试场景（见 Verification Plan）：
+1. 直接命令：`rm -rf /tmp/test` → forbidden
+2. 分号链：`echo hello; rm -rf /tmp/test` → forbidden
+3. 管道：`find . | xargs rm -rf` → forbidden
+4. 子 shell：`bash -c "rm -rf /tmp/test"` → prompt（子 shell 内命令需审批）
+5. 复合命令：`git add . && git push --force` → forbidden（匹配最严格规则）
+
+Starlark `prefix_rule` 基于命令前缀匹配，对管道和子 shell 的拦截能力有限。对于超出 prefix_rule 能力的绕过场景，在 AGENTS.md 中补充文字约束作为防御层。
 
 **`rules/safety.rules`**
 ```starlark
@@ -117,6 +168,23 @@ prefix_rule(
     decision="prompt",
     justification="Consider running in tmux"
 )
+prefix_rule(
+    pattern=["yarn", "dev"],
+    decision="prompt",
+    justification="Consider running in tmux"
+)
+
+# 权限提升
+prefix_rule(
+    pattern=["sudo"],
+    decision="forbidden",
+    justification="Privilege escalation not allowed"
+)
+prefix_rule(
+    pattern=["su"],
+    decision="forbidden",
+    justification="User switching not allowed"
+)
 ```
 
 **`rules/git-safety.rules`**
@@ -127,11 +195,23 @@ prefix_rule(
     decision="prompt",
     justification="Review changes before pushing to remote"
 )
-# 禁止 force push 到 main
+# 禁止 force push
 prefix_rule(
     pattern=["git", "push", "--force"],
     decision="forbidden",
     justification="Force push is dangerous and can lose work"
+)
+# 禁止 hard reset
+prefix_rule(
+    pattern=["git", "reset", "--hard"],
+    decision="forbidden",
+    justification="Hard reset discards uncommitted changes"
+)
+# 禁止 force clean
+prefix_rule(
+    pattern=["git", "clean", "-f"],
+    decision="forbidden",
+    justification="Force clean permanently deletes untracked files"
 )
 ```
 
@@ -143,13 +223,24 @@ prefix_rule(
     decision="forbidden",
     justification="Recursive force delete is too dangerous"
 )
+prefix_rule(
+    pattern=["rm", "-r"],
+    decision="prompt",
+    justification="Recursive delete requires confirmation"
+)
 ```
 
 ### 1.4 创建 config.toml
 
 **来源**：`mcp-configs/mcp-servers.json` + `contexts/`
 
+**Schema 兼容性措施**：
+- `scripts/ci/check-config-schema.js`：对比当前 config.toml 与 Codex CLI 支持的字段列表，对未知字段发出警告
+- config.toml 中仅使用 Codex 官方文档明确记载的字段，避免使用 undocumented 行为
+- 在 config.toml 头部注释中标注对应的 Codex CLI 最低版本要求
+
 ```toml
+# 最低 Codex CLI 版本: 0.98.0
 model = "o4-mini"
 sandbox = "network"
 
@@ -174,15 +265,27 @@ GITHUB_PERSONAL_ACCESS_TOKEN = "${GITHUB_PAT}"
 
 ### 1.5 创建 requirements.toml
 
+遵循最小权限原则，开箱即用时采用受限沙箱与按需审批。
+
 ```toml
+# 最低 Codex CLI 版本: 0.98.0
+
 [security]
 no_secrets_in_code = true
 require_parameterized_queries = true
 
 [approval]
+# 默认安全基线：高风险操作均需审批
 network_access = "prompt"
 file_delete = "prompt"
+shell_execute = "prompt"           # 任意 shell 命令默认需审批
+external_service_call = "prompt"   # 调用外部服务需审批
 ```
+
+**默认 profile 安全原则**：
+- 默认 sandbox 模式为 `network`（允许网络但受限）
+- 所有 `forbidden` 规则在任何 profile 下均不可覆盖
+- `prompt` 规则可由用户在 TUI 中逐条审批并记录到 `default.rules`
 
 ---
 
@@ -300,28 +403,41 @@ description: <one-line description>
 | `skills/python-rules/SKILL.md` | `rules/python/*.md` (5 files) | Python 同上 |
 | `skills/typescript-rules/SKILL.md` | `rules/typescript/*.md` (5 files) | TypeScript 同上 |
 
-> 这些 skills 是语言特定 AGENTS.md 模板的补充——AGENTS.md 提供基础规则（自动加载），skills 提供详细的模式和惯用法（按需加载）。
+这些 skills 是语言特定 AGENTS.md 模板的补充——AGENTS.md 提供基础规则（自动加载），skills 提供详细的模式和惯用法（按需加载）。
 
 ---
 
 ## Phase 5: Hook 功能迁移
 
-| 原 Hook | 类型 | 迁移到 | 机制 |
-|---------|------|--------|------|
-| Block dev server outside tmux | PreToolUse | `rules/safety.rules` | Starlark `prompt` |
-| Tmux reminder | PreToolUse | AGENTS.md | 文字指令 |
-| Git push review | PreToolUse | `rules/git-safety.rules` | Starlark `prompt` |
-| Block random .md creation | PreToolUse | `rules/file-hygiene.rules` | Starlark `forbidden` |
-| Suggest compact | PreToolUse | **丢弃** | Codex 无 /compact |
-| Auto-format (prettier) | PostToolUse | AGENTS.md | 文字指令 |
-| TypeScript check (tsc) | PostToolUse | AGENTS.md | 文字指令 |
-| console.log warning | PostToolUse/Stop | AGENTS.md | 文字指令 |
-| Log PR URL | PostToolUse | AGENTS.md | 文字指令 |
-| Async build analysis | PostToolUse | **丢弃** | 占位符 |
-| Load session context | SessionStart | **丢弃** | Codex 原生 sessions |
-| Persist session state | SessionEnd | **丢弃** | Codex 原生 sessions |
-| Evaluate session patterns | SessionEnd | **降级** | 手动 `/learn` |
-| Pre-compact save | PreCompact | **丢弃** | Codex 无 /compact |
+Hook 迁移采用"Starlark rules 强制执行 + AGENTS.md 文字指令 + CI 脚本兜底"三层保障策略，为每类迁移明确替代机制和可观测性手段。
+
+| 原 Hook | 类型 | 迁移到 | 机制 | 可观测性替代 |
+|---------|------|--------|------|-------------|
+| Block dev server outside tmux | PreToolUse | `rules/safety.rules` | Starlark `prompt` | exec policy 审批日志 |
+| Tmux reminder | PreToolUse | AGENTS.md | 文字指令 | — |
+| Git push review | PreToolUse | `rules/git-safety.rules` | Starlark `prompt` | exec policy 审批日志 |
+| Block random .md creation | PreToolUse | `rules/file-hygiene.rules` | Starlark `forbidden` | exec policy 拦截日志 |
+| Suggest compact | PreToolUse | **丢弃** | Codex 无 /compact | — |
+| Auto-format (prettier) | PostToolUse | AGENTS.md + CI 脚本 | 文字指令 + `scripts/ci/check-format.sh` | CI 格式化检查报告 |
+| TypeScript check (tsc) | PostToolUse | AGENTS.md + CI 脚本 | 文字指令 + `scripts/ci/check-types.sh` | CI 类型检查报告 |
+| console.log warning | PostToolUse/Stop | AGENTS.md + CI 脚本 | 文字指令 + `scripts/ci/check-console-log.sh` | CI lint 报告 |
+| Log PR URL | PostToolUse | AGENTS.md | 文字指令 | — |
+| Async build analysis | PostToolUse | CI 脚本 | `scripts/ci/build-analysis.sh` | CI 构建分析报告 |
+| Load session context | SessionStart | **丢弃** | Codex 原生 sessions | Codex session logs |
+| Persist session state | SessionEnd | **丢弃** | Codex 原生 sessions | Codex session logs |
+| Evaluate session patterns | SessionEnd | **降级** | 手动 `/learn` | `/learn` 输出记录 |
+| Pre-compact save | PreCompact | **丢弃** | Codex 无 /compact | — |
+
+### 补充 CI 脚本
+
+为弥补 PostToolUse hooks 丢失后的强制执行能力，新增以下 CI 校验脚本（放入 `scripts/ci/`），确保即使 AGENTS.md 文字指令被忽略，CI 层仍能捕获问题：
+
+| 脚本 | 用途 | 触发时机 |
+|------|------|---------|
+| `check-format.sh` | 检查代码格式（prettier/gofmt/black） | PR CI pipeline |
+| `check-types.sh` | TypeScript 类型检查 | PR CI pipeline |
+| `check-console-log.sh` | 检测残留的 console.log/print 调试语句 | PR CI pipeline |
+| `build-analysis.sh` | 构建状态分析与报告 | PR CI pipeline |
 
 ---
 
@@ -338,48 +454,157 @@ description: <one-line description>
 | `scripts/skill-create-output.js` | **保留** |
 | `scripts/ci/validate-*.js` (5) | **改写**：验证 Codex 结构 |
 
-新增：`scripts/install.sh`、`scripts/uninstall.sh`
+新增：
+- `scripts/install.sh`、`scripts/uninstall.sh`
+- `scripts/ci/check-format.sh`、`scripts/ci/check-types.sh`、`scripts/ci/check-console-log.sh`、`scripts/ci/build-analysis.sh`
 
 ---
 
 ## Phase 7: 分发和安装
 
+### 安装方式
+
 ```bash
-# 一键安装
-curl -sSL https://raw.githubusercontent.com/<org>/everything-codex/main/scripts/install.sh | bash
+# 推荐方式：先下载再执行（可审查脚本内容）
+curl -sSL https://raw.githubusercontent.com/<org>/everything-codex/main/scripts/install.sh -o /tmp/install-codex.sh
+# 校验 checksum
+curl -sSL https://raw.githubusercontent.com/<org>/everything-codex/main/scripts/install.sh.sha256 -o /tmp/install-codex.sh.sha256
+(cd /tmp && shasum -a 256 -c install-codex.sh.sha256)
+bash /tmp/install-codex.sh
 
-# 手动
+# 手动方式
 git clone https://github.com/<org>/everything-codex.git ~/.codex/.everything-codex
-./scripts/install.sh --local
+cd ~/.codex/.everything-codex && ./scripts/install.sh --local
 
-# 交互式
+# 交互式（安装后在 Codex 内运行）
 # /configure-codex 选择性启用
+
+# 卸载 / 回滚
+~/.codex/.everything-codex/scripts/uninstall.sh
+# 或从备份恢复
+~/.codex/.everything-codex/scripts/install.sh --rollback
 ```
+
+### 供应链安全
+
+每次 release 同步发布：
+- `install.sh.sha256` — 安装脚本的 SHA-256 校验文件
+- `CHECKSUMS.sha256` — 所有发布文件的校验和
+- 脚本内嵌版本号，执行时验证与 release tag 一致
 
 ### install.sh 关键逻辑
 
 ```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
 CODEX_DIR="$HOME/.codex"
+BACKUP_DIR="$CODEX_DIR/.backup-$(date +%Y%m%d%H%M%S)"
+INSTALL_MANIFEST="$CODEX_DIR/.everything-codex-manifest"
 
-# 1. 复制根 AGENTS.md
-cp AGENTS.md "$CODEX_DIR/AGENTS.md"
+# ============================================
+# 0. 备份现有配置（回滚基础）
+# ============================================
+if [ -d "$CODEX_DIR" ]; then
+    echo "Backing up existing ~/.codex to $BACKUP_DIR ..."
+    mkdir -p "$BACKUP_DIR"
+    for f in AGENTS.md golang/AGENTS.md python/AGENTS.md typescript/AGENTS.md; do
+        if [ -f "$CODEX_DIR/$f" ]; then
+            mkdir -p "$(dirname "$BACKUP_DIR/$f")"
+            cp "$CODEX_DIR/$f" "$BACKUP_DIR/$f"
+        fi
+    done
+    [ -d "$CODEX_DIR/skills" ] && cp -r "$CODEX_DIR/skills" "$BACKUP_DIR/skills"
+    [ -d "$CODEX_DIR/rules" ] && cp -r "$CODEX_DIR/rules" "$BACKUP_DIR/rules"
+    echo "Backup complete: $BACKUP_DIR"
+fi
 
-# 2. 复制语言特定 AGENTS.md 模板（用户可选）
-mkdir -p "$CODEX_DIR/golang" "$CODEX_DIR/python" "$CODEX_DIR/typescript"
-cp golang/AGENTS.md "$CODEX_DIR/golang/AGENTS.md"
-cp python/AGENTS.md "$CODEX_DIR/python/AGENTS.md"
-cp typescript/AGENTS.md "$CODEX_DIR/typescript/AGENTS.md"
+# ============================================
+# 1. AGENTS.md — 合并而非覆盖
+# ============================================
+if [ -f "$CODEX_DIR/AGENTS.md" ]; then
+    echo ""
+    echo "Existing AGENTS.md detected. Choose merge strategy:"
+    echo "  1) append  — 追加 everything-codex 规则到现有文件末尾"
+    echo "  2) include — 在现有文件末尾添加 include 引用"
+    echo "  3) replace — 替换为 everything-codex 版本（原文件已备份）"
+    echo "  4) skip    — 跳过，不修改"
+    echo "  5) dry-run — 仅显示差异，不修改"
+    read -rp "选择 [1-5, default=4]: " choice
+    case "${choice:-4}" in
+        1) echo -e "\n# --- everything-codex rules ---\n" >> "$CODEX_DIR/AGENTS.md"
+           cat AGENTS.md >> "$CODEX_DIR/AGENTS.md" ;;
+        2) echo -e "\n# Include everything-codex rules\n# See: ~/.codex/.everything-codex/AGENTS.md" >> "$CODEX_DIR/AGENTS.md" ;;
+        3) cp AGENTS.md "$CODEX_DIR/AGENTS.md" ;;
+        4) echo "Skipped AGENTS.md" ;;
+        5) diff "$CODEX_DIR/AGENTS.md" AGENTS.md || true ;;
+    esac
+else
+    cp AGENTS.md "$CODEX_DIR/AGENTS.md"
+fi
 
-# 3. 复制 skills
+# ============================================
+# 2. 语言特定 AGENTS.md（用户可选）
+# ============================================
+for lang in golang python typescript; do
+    mkdir -p "$CODEX_DIR/$lang"
+    if [ -f "$CODEX_DIR/$lang/AGENTS.md" ]; then
+        echo "Existing $lang/AGENTS.md detected, skipping (use --force to overwrite)"
+    else
+        cp "$lang/AGENTS.md" "$CODEX_DIR/$lang/AGENTS.md"
+    fi
+done
+
+# ============================================
+# 3-5. Skills / Rules / Config
+# ============================================
+mkdir -p "$CODEX_DIR/skills" "$CODEX_DIR/rules"
 cp -r skills/* "$CODEX_DIR/skills/"
-
-# 4. 复制 execution policy rules
-mkdir -p "$CODEX_DIR/rules"
 cp rules/*.rules "$CODEX_DIR/rules/"
-
-# 5. 复制 config 模板
 cp config.toml "$CODEX_DIR/config.toml.example"
 cp requirements.toml "$CODEX_DIR/requirements.toml.example"
+
+# ============================================
+# 6. 记录安装清单（用于卸载和回滚）
+# ============================================
+find "$CODEX_DIR/skills" "$CODEX_DIR/rules" -type f > "$INSTALL_MANIFEST"
+echo "$CODEX_DIR/config.toml.example" >> "$INSTALL_MANIFEST"
+echo "$CODEX_DIR/requirements.toml.example" >> "$INSTALL_MANIFEST"
+echo "Manifest written to $INSTALL_MANIFEST"
+
+# ============================================
+# 7. 安装后验证
+# ============================================
+echo ""
+echo "Running post-install verification..."
+if command -v codex &>/dev/null; then
+    codex --check-config && echo "Config valid" || echo "Config check failed"
+else
+    echo "codex CLI not found, skipping config check"
+fi
+echo ""
+echo "Installation complete. Backup at: $BACKUP_DIR"
+echo "To rollback: $0 --rollback"
+```
+
+### uninstall.sh / rollback 逻辑
+
+```bash
+# --rollback: 从最近的备份恢复
+LATEST_BACKUP=$(ls -dt "$CODEX_DIR/.backup-"* 2>/dev/null | head -1)
+if [ -n "$LATEST_BACKUP" ]; then
+    cp -r "$LATEST_BACKUP"/* "$CODEX_DIR/"
+    echo "Restored from $LATEST_BACKUP"
+fi
+
+# uninstall: 根据 manifest 删除安装的文件
+if [ -f "$INSTALL_MANIFEST" ]; then
+    while IFS= read -r file; do
+        rm -f "$file"
+    done < "$INSTALL_MANIFEST"
+    rm -f "$INSTALL_MANIFEST"
+    echo "Uninstalled everything-codex files"
+fi
 ```
 
 ---
@@ -390,6 +615,8 @@ cp requirements.toml "$CODEX_DIR/requirements.toml.example"
 - `CONTRIBUTING.md` — 更新（skill 格式、AGENTS.md 规范、Starlark rules 规范）
 - `docs/migration-from-claude-code.md` — 迁移指南
 - `docs/agents-md-architecture.md` — 层级 AGENTS.md 架构说明
+- `docs/capability-degradation.md` — 能力降级说明，明确哪些 Claude Code 特性不再支持及替代路径
+- `docs/operations-runbook.md` — 运维手册（故障排查、回滚操作、版本升级 playbook）
 - `docs/zh-CN/` — 中文翻译
 - `examples/AGENTS.md`、`config.toml`、`requirements.toml`
 
@@ -477,14 +704,20 @@ everything-codex/
 │   ├── iterative-retrieval/SKILL.md
 │   └── project-guidelines-example/SKILL.md
 ├── scripts/
-│   ├── install.sh
-│   ├── uninstall.sh
+│   ├── install.sh                 # 安全安装（备份+合并+回滚）
+│   ├── install.sh.sha256          # 安装脚本校验和
+│   ├── uninstall.sh               # 基于 manifest 的干净卸载
 │   ├── lib/
 │   │   ├── package-manager.js
 │   │   └── utils.js
 │   ├── ci/
 │   │   ├── validate-skills.js
-│   │   └── validate-structure.js
+│   │   ├── validate-structure.js
+│   │   ├── check-config-schema.js # config.toml schema 兼容性检查
+│   │   ├── check-format.sh        # 代码格式检查
+│   │   ├── check-types.sh         # TypeScript 类型检查
+│   │   ├── check-console-log.sh   # 调试语句检测
+│   │   └── build-analysis.sh      # 构建状态分析
 │   ├── setup-package-manager.js
 │   └── skill-create-output.js
 ├── examples/
@@ -494,6 +727,8 @@ everything-codex/
 ├── docs/
 │   ├── migration-from-claude-code.md
 │   ├── agents-md-architecture.md
+│   ├── capability-degradation.md  # 能力降级说明
+│   ├── operations-runbook.md      # 运维手册
 │   └── zh-CN/
 ├── tests/
 ├── README.md
@@ -509,24 +744,68 @@ everything-codex/
 | 能力 | Claude Code | Codex（重构后） | 影响 |
 |------|------------|----------------|------|
 | Subagent 隔离 | 完整 | 文字约束 | **高** |
-| 生命周期 hooks | 6 种 | 无 | **高** — 降级为 AGENTS.md 指令 + exec policies |
+| 生命周期 hooks | 6 种 | 无 | **高** — 降级为 AGENTS.md 指令 + exec policies + CI 脚本 |
 | 编码规则系统 | `rules/*.md` 单层 | **AGENTS.md 层级** + skills | **升级** — 层级覆盖更灵活 |
 | 命令安全控制 | hooks (JS) | **Starlark rules** | **升级** — 声明式更清晰 |
 | Config profiles | 无 | **原生支持** | **新增** |
 | 安全约束 | 无 | **requirements.toml** | **新增** |
 | Agent 模型切换 | 支持 | 不支持 | **中** |
-| 自动格式化 | PostToolUse hook | AGENTS.md 指令 | **中** |
+| 自动格式化 | PostToolUse hook | AGENTS.md 指令 + CI 脚本 | **中** |
 | 持续学习 | Hook 自动 | 手动 `/learn` | **低** |
 
 ---
 
 ## Verification Plan
 
-1. **AGENTS.md 层级测试**：验证全局 + 语言 AGENTS.md 正确加载
-2. **Execution policy 测试**：`codex execpolicy check --rules rules/safety.rules`
-3. **Skill 发现测试**：启动 `codex`，验证 `/` menu 显示所有 skills
-4. **Profile 测试**：`codex -p dev`、`codex -p review`
-5. **核心 skill 端到端**：`/plan`、`/code-review`、`/tdd`、`/orchestrate`
-6. **安装脚本测试**：干净环境 `install.sh`
-7. **Config 验证**：`codex --check-config`
-8. **结构验证**：`scripts/ci/validate-structure.js`
+验证计划分为三层 gate，每层都有明确的通过/失败判定和自动化执行方式。
+
+### Gate 0: 结构验证（CI 自动化，阻断 PR 合并）
+
+| 检查项 | 命令 | 通过条件 |
+|-------|------|---------|
+| 目录结构 | `scripts/ci/validate-structure.js` | exit 0 |
+| Skill frontmatter | `scripts/ci/validate-skills.js` | 所有 SKILL.md 含 `name`/`description` |
+| 无 Claude Code 引用 | `grep -r "Claude Code\|Task tool\|Read tool" skills/` | 无匹配 |
+| Config 语法 | `codex --check-config` | exit 0 |
+| Starlark 语法 | `codex execpolicy check --rules rules/*.rules` | exit 0 |
+| Schema 兼容性 | `scripts/ci/check-config-schema.js` | 无未知字段警告 |
+
+### Gate 1: 功能验证（CI 自动化，阻断 release）
+
+| 检查项 | 方法 | 通过条件 |
+|-------|------|---------|
+| AGENTS.md 层级加载 | 在 `~/.codex/` 和项目目录分别启动 codex，检查 loaded instructions | 全局 + 项目级均正确加载 |
+| Execution policy 生效 | 反绕过测试矩阵（5 个场景） | 所有高危命令被正确拦截 |
+| Skill 发现 | 启动 codex，`/` menu | 所有已注册 skills 可见 |
+| Profile 启动 | `codex -p dev`、`codex -p review` | 无报错启动 |
+| 核心 skill 端到端 | `/plan`、`/code-review`、`/tdd`、`/orchestrate` | 每个 skill 可触发并输出预期格式 |
+
+### Gate 2: 安装验证（release 前手动 + CI）
+
+| 检查项 | 方法 | 通过条件 |
+|-------|------|---------|
+| 干净环境安装 | Docker 容器中 `install.sh` | exit 0 + 验证文件到位 |
+| 已有环境安装 | 预置 `~/.codex/AGENTS.md` 后安装 | 原文件不被覆盖（默认 skip） |
+| 安装后 config 验证 | `codex --check-config` | exit 0 |
+| 卸载完整性 | `uninstall.sh` 后检查残留 | manifest 中所有文件已删除 |
+| 回滚恢复 | `install.sh --rollback` | 恢复到备份状态，diff 无差异 |
+| Checksum 验证 | `shasum -a 256 -c CHECKSUMS.sha256` | 所有文件校验通过 |
+
+### 发布门禁规则
+
+- **PR 合并**：Gate 0 全部通过 → 允许合并
+- **Release 发布**：Gate 0 + Gate 1 全部通过 → 允许创建 release tag
+- **Release 资产发布**：Gate 2 全部通过 → 允许上传 release assets
+- **任一 gate 失败**：自动阻断，修复后重新运行全部 gates
+
+---
+
+## Definition of Done（验收标准）
+
+1. **安装可逆**：任意失败点都可在 1 步回滚到安装前状态（`install.sh --rollback`）
+2. **规则可证**：高危命令矩阵中所有场景的 policy 决策与预期一致（反绕过测试通过）
+3. **迁移可用**：核心 skills 和命令在 clean env 和已有 `~/.codex` env 均可运行
+4. **审核可追溯**：每次发布包含 `check-config`、smoke test、review 证据（CI artifacts）
+5. **默认安全**：默认 profile 不允许无审批执行高风险操作（forbidden/prompt 规则覆盖完整）
+6. **无 Claude Code 残留**：代码库中无 Claude Code 特有引用（CI grep 检查通过）
+7. **文档完备**：README、迁移指南、架构说明均已更新且与实际结构一致
