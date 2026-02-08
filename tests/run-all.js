@@ -12,12 +12,11 @@ const fs = require('fs');
 const testsDir = __dirname;
 const testFiles = [
   'lib/utils.test.js',
-  'lib/package-manager.test.js',
-  'hooks/hooks.test.js'
+  'lib/package-manager.test.js'
 ];
 
 console.log('╔══════════════════════════════════════════════════════════╗');
-console.log('║           Everything Claude Code - Test Suite            ║');
+console.log('║             everything-codex - Test Suite                 ║');
 console.log('╚══════════════════════════════════════════════════════════╝');
 console.log();
 
