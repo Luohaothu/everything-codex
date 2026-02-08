@@ -1,63 +1,37 @@
 ---
 name: strategic-compact
-description: Suggests manual context compaction at logical intervals to preserve context through task phases rather than arbitrary auto-compaction.
+description: Suggests starting new sessions at logical intervals to preserve context through task phases.
 ---
 
-# Strategic Compact Skill
+# Strategic Context Management
 
-Suggests manual `/compact` at strategic points in your workflow rather than relying on arbitrary auto-compaction.
+Manage context by starting new sessions at strategic points in your workflow rather than running into context limits.
 
-## Why Strategic Compaction?
+## Why Strategic Session Boundaries?
 
-Auto-compaction triggers at arbitrary points:
-- Often mid-task, losing important context
+Running out of context at arbitrary points causes:
+- Loss of important task context mid-implementation
 - No awareness of logical task boundaries
-- Can interrupt complex multi-step operations
+- Interrupted complex multi-step operations
 
-Strategic compaction at logical boundaries:
-- **After exploration, before execution** - Compact research context, keep implementation plan
-- **After completing a milestone** - Fresh start for next phase
-- **Before major context shifts** - Clear exploration context before different task
+Strategic session boundaries at logical milestones:
+- **After exploration, before execution** — Fresh session with implementation plan
+- **After completing a milestone** — Clean start for next phase
+- **Before major context shifts** — New session for different task
 
-## How It Works
+## When to Start a New Session
 
-The `suggest-compact.sh` script runs on PreToolUse (Edit/Write) and:
+Consider starting a new session when:
 
-1. **Tracks tool calls** - Counts tool invocations in session
-2. **Threshold detection** - Suggests at configurable threshold (default: 50 calls)
-3. **Periodic reminders** - Reminds every 25 calls after threshold
-
-## Hook Setup
-
-Add to your `~/.claude/settings.json`:
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [{
-      "matcher": "tool == \"Edit\" || tool == \"Write\"",
-      "hooks": [{
-        "type": "command",
-        "command": "~/.claude/skills/strategic-compact/suggest-compact.sh"
-      }]
-    }]
-  }
-}
-```
-
-## Configuration
-
-Environment variables:
-- `COMPACT_THRESHOLD` - Tool calls before first suggestion (default: 50)
+1. **After planning** — Plan is finalized, start fresh for implementation
+2. **After debugging** — Error resolution complete, clear context for next task
+3. **After major milestone** — Feature complete, start review in fresh session
+4. **Context feels heavy** — Many files read, lots of tool output accumulated
 
 ## Best Practices
 
-1. **Compact after planning** - Once plan is finalized, compact to start fresh
-2. **Compact after debugging** - Clear error-resolution context before continuing
-3. **Don't compact mid-implementation** - Preserve context for related changes
-4. **Read the suggestion** - The hook tells you *when*, you decide *if*
-
-## Related
-
-- [The Longform Guide](https://x.com/affaanmustafa/status/2014040193557471352) - Token optimization section
-- Memory persistence hooks - For state that survives compaction
+1. **Summarize before ending** — Document current state before starting new session
+2. **Save plans to files** — Write implementation plans to `.codex/plan/` so they survive across sessions
+3. **Commit frequently** — Git commits serve as recovery points
+4. **Use checkpoints** — `/checkpoint create` before major transitions
+5. **Don't split mid-implementation** — Keep related changes in same session

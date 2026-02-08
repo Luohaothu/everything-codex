@@ -167,7 +167,7 @@ ${chalk.yellow('4.')} Evolve into skills: ${chalk.cyan('/evolve')}
 
   footer() {
     console.log(chalk.gray('─'.repeat(60)));
-    console.log(chalk.dim(`  Powered by Everything Claude Code • ecc.tools`));
+    console.log(chalk.dim(`  Powered by everything-codex • ecc.tools`));
     console.log(chalk.dim(`  GitHub App: github.com/apps/skill-creator`));
     console.log('\n');
   }
@@ -227,8 +227,8 @@ async function demo() {
   ]);
 
   output.output(
-    '.claude/skills/pmx-patterns/SKILL.md',
-    '.claude/homunculus/instincts/inherited/pmx-instincts.yaml'
+    '.agents/skills/pmx-patterns/SKILL.md',
+    '.codex/instincts/inherited/pmx-instincts.yaml'
   );
 
   output.nextSteps();

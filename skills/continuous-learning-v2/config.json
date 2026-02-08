@@ -2,15 +2,15 @@
   "version": "2.0",
   "observation": {
     "enabled": true,
-    "store_path": "~/.claude/homunculus/observations.jsonl",
+    "store_path": "~/.codex/observations.jsonl",
     "max_file_size_mb": 10,
     "archive_after_days": 7,
     "capture_tools": ["Edit", "Write", "Bash", "Read", "Grep", "Glob"],
     "ignore_tools": ["TodoWrite"]
   },
   "instincts": {
-    "personal_path": "~/.claude/homunculus/instincts/personal/",
-    "inherited_path": "~/.claude/homunculus/instincts/inherited/",
+    "personal_path": "~/.codex/instincts/personal/",
+    "inherited_path": "~/.codex/instincts/inherited/",
     "min_confidence": 0.3,
     "auto_approve_threshold": 0.7,
     "confidence_decay_rate": 0.02,
@@ -31,7 +31,7 @@
   },
   "evolution": {
     "cluster_threshold": 3,
-    "evolved_path": "~/.claude/homunculus/evolved/",
+    "evolved_path": "~/.codex/evolved/",
     "auto_evolve": false
   },
   "integration": {

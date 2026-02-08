@@ -10,7 +10,7 @@
 
 Types: feat, fix, refactor, docs, test, chore, perf, ci
 
-Note: Attribution disabled globally via ~/.claude/settings.json.
+Note: Attribution can be configured in your Codex CLI settings.
 
 ## Pull Request Workflow
 

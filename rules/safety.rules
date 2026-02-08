@@ -1,0 +1,35 @@
+# Safety rules for long-running and privilege-escalation commands
+
+# Dev servers should run in tmux for session persistence
+prefix_rule(
+    pattern=["npm", "run", "dev"],
+    decision="prompt",
+    justification="Consider running in tmux for long-running dev servers"
+)
+prefix_rule(
+    pattern=["pnpm", "dev"],
+    decision="prompt",
+    justification="Consider running in tmux"
+)
+prefix_rule(
+    pattern=["yarn", "dev"],
+    decision="prompt",
+    justification="Consider running in tmux"
+)
+prefix_rule(
+    pattern=["bun", "run", "dev"],
+    decision="prompt",
+    justification="Consider running in tmux"
+)
+
+# Privilege escalation
+prefix_rule(
+    pattern=["sudo"],
+    decision="forbidden",
+    justification="Privilege escalation not allowed"
+)
+prefix_rule(
+    pattern=["su"],
+    decision="forbidden",
+    justification="User switching not allowed"
+)

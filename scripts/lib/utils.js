@@ -1,5 +1,5 @@
 /**
- * Cross-platform utility functions for Claude Code hooks and scripts
+ * Cross-platform utility functions for Codex CLI scripts
  * Works on Windows, macOS, and Linux
  */
 
@@ -21,31 +21,31 @@ function getHomeDir() {
 }
 
 /**
- * Get the Claude config directory
+ * Get the Codex config directory
  */
-function getClaudeDir() {
-  return path.join(getHomeDir(), '.claude');
+function getCodexDir() {
+  return path.join(getHomeDir(), '.codex');
 }
 
 /**
  * Get the sessions directory
  */
 function getSessionsDir() {
-  return path.join(getClaudeDir(), 'sessions');
+  return path.join(getCodexDir(), 'sessions');
 }
 
 /**
  * Get the session aliases file path
  */
 function getAliasesPath() {
-  return path.join(getClaudeDir(), 'session-aliases.json');
+  return path.join(getCodexDir(), 'session-aliases.json');
 }
 
 /**
  * Get the learned skills directory
  */
 function getLearnedSkillsDir() {
-  return path.join(getClaudeDir(), 'skills', 'learned');
+  return path.join(getHomeDir(), '.agents', 'skills', 'learned');
 }
 
 /**
@@ -105,11 +105,11 @@ function getProjectName() {
 }
 
 /**
- * Get short session ID from CLAUDE_SESSION_ID environment variable
+ * Get short session ID from CODEX_SESSION_ID environment variable
  * Returns last 8 characters, falls back to project name then 'default'
  */
 function getSessionIdShort(fallback = 'default') {
-  const sessionId = process.env.CLAUDE_SESSION_ID;
+  const sessionId = process.env.CODEX_SESSION_ID;
   if (sessionId && sessionId.length > 0) {
     return sessionId.slice(-8);
   }
@@ -214,14 +214,14 @@ async function readStdinJson() {
 }
 
 /**
- * Log to stderr (visible to user in Claude Code)
+ * Log to stderr (visible to user in Codex CLI)
  */
 function log(message) {
   console.error(message);
 }
 
 /**
- * Output to stdout (returned to Claude)
+ * Output to stdout (returned to Codex)
  */
 function output(data) {
   if (typeof data === 'object') {
@@ -387,7 +387,7 @@ module.exports = {
 
   // Directories
   getHomeDir,
-  getClaudeDir,
+  getCodexDir,
   getSessionsDir,
   getAliasesPath,
   getLearnedSkillsDir,

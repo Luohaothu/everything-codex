@@ -1,0 +1,41 @@
+# Git safety rules
+
+# Force push is dangerous
+prefix_rule(
+    pattern=["git", "push", "--force"],
+    decision="forbidden",
+    justification="Force push can lose remote work. Use --force-with-lease if needed."
+)
+prefix_rule(
+    pattern=["git", "push", "-f"],
+    decision="forbidden",
+    justification="Force push can lose remote work. Use --force-with-lease if needed."
+)
+
+# Regular push requires review
+prefix_rule(
+    pattern=["git", "push"],
+    decision="prompt",
+    justification="Review changes before pushing to remote"
+)
+
+# Hard reset discards work
+prefix_rule(
+    pattern=["git", "reset", "--hard"],
+    decision="forbidden",
+    justification="Hard reset permanently discards uncommitted changes"
+)
+
+# Force clean deletes untracked files
+prefix_rule(
+    pattern=["git", "clean", "-f"],
+    decision="forbidden",
+    justification="Force clean permanently deletes untracked files"
+)
+
+# Branch -D force deletes
+prefix_rule(
+    pattern=["git", "branch", "-D"],
+    decision="prompt",
+    justification="Force-deleting branches can lose unmerged work"
+)

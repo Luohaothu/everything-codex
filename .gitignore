@@ -30,3 +30,15 @@ examples/sessions/*.tmp
 
 # Local drafts
 marketing/
+
+# Codex local state
+.codex/sessions/
+.codex/cache/
+
+# Legacy platform dirs (not used in this repo)
+.claude/
+.claude-plugin/
+.opencode/
+
+# Git worktrees
+.worktrees/

@@ -57,17 +57,17 @@ function runTests() {
     assert.ok(fs.existsSync(home), 'Home dir should exist');
   })) passed++; else failed++;
 
-  if (test('getClaudeDir returns path under home', () => {
-    const claudeDir = utils.getClaudeDir();
+  if (test('getCodexDir returns path under home', () => {
+    const codexDir = utils.getCodexDir();
     const homeDir = utils.getHomeDir();
-    assert.ok(claudeDir.startsWith(homeDir), 'Claude dir should be under home');
-    assert.ok(claudeDir.includes('.claude'), 'Should contain .claude');
+    assert.ok(codexDir.startsWith(homeDir), 'Codex dir should be under home');
+    assert.ok(codexDir.includes('.codex'), 'Should contain .codex');
   })) passed++; else failed++;
 
-  if (test('getSessionsDir returns path under Claude dir', () => {
+  if (test('getSessionsDir returns path under Codex dir', () => {
     const sessionsDir = utils.getSessionsDir();
-    const claudeDir = utils.getClaudeDir();
-    assert.ok(sessionsDir.startsWith(claudeDir), 'Sessions should be under Claude dir');
+    const codexDir = utils.getCodexDir();
+    assert.ok(sessionsDir.startsWith(codexDir), 'Sessions should be under Codex dir');
     assert.ok(sessionsDir.includes('sessions'), 'Should contain sessions');
   })) passed++; else failed++;
 
@@ -122,35 +122,35 @@ function runTests() {
   console.log('\nSession ID Functions:');
 
   if (test('getSessionIdShort falls back to project name', () => {
-    const original = process.env.CLAUDE_SESSION_ID;
-    delete process.env.CLAUDE_SESSION_ID;
+    const original = process.env.CODEX_SESSION_ID;
+    delete process.env.CODEX_SESSION_ID;
     try {
       const shortId = utils.getSessionIdShort();
       assert.strictEqual(shortId, utils.getProjectName());
     } finally {
-      if (original) process.env.CLAUDE_SESSION_ID = original;
+      if (original) process.env.CODEX_SESSION_ID = original;
     }
   })) passed++; else failed++;
 
   if (test('getSessionIdShort returns last 8 characters', () => {
-    const original = process.env.CLAUDE_SESSION_ID;
-    process.env.CLAUDE_SESSION_ID = 'test-session-abc12345';
+    const original = process.env.CODEX_SESSION_ID;
+    process.env.CODEX_SESSION_ID = 'test-session-abc12345';
     try {
       assert.strictEqual(utils.getSessionIdShort(), 'abc12345');
     } finally {
-      if (original) process.env.CLAUDE_SESSION_ID = original;
-      else delete process.env.CLAUDE_SESSION_ID;
+      if (original) process.env.CODEX_SESSION_ID = original;
+      else delete process.env.CODEX_SESSION_ID;
     }
   })) passed++; else failed++;
 
   if (test('getSessionIdShort handles short session IDs', () => {
-    const original = process.env.CLAUDE_SESSION_ID;
-    process.env.CLAUDE_SESSION_ID = 'short';
+    const original = process.env.CODEX_SESSION_ID;
+    process.env.CODEX_SESSION_ID = 'short';
     try {
       assert.strictEqual(utils.getSessionIdShort(), 'short');
     } finally {
-      if (original) process.env.CLAUDE_SESSION_ID = original;
-      else delete process.env.CLAUDE_SESSION_ID;
+      if (original) process.env.CODEX_SESSION_ID = original;
+      else delete process.env.CODEX_SESSION_ID;
     }
   })) passed++; else failed++;
 

@@ -1,0 +1,21 @@
+# Example Codex CLI configuration
+# Copy to ~/.codex/config.toml and customize
+
+# Default model for code generation
+model = "o4-mini"
+
+# Sandbox mode: "workspace-write" allows writing within the project
+sandbox = "workspace-write"
+
+# Profiles for different workflows
+[profile.dev]
+model = "o4-mini"
+sandbox = "workspace-write"
+
+[profile.review]
+model = "o4-mini"
+sandbox = "read-only"
+
+[profile.research]
+model = "o4-mini"
+sandbox = "read-only"
