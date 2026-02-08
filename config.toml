@@ -1,0 +1,95 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+# everything-codex configuration
+# Minimum Codex CLI version: 0.98.0
+
+model = "o4-mini"
+sandbox_mode = "workspace-write"
+
+[sandbox_workspace_write]
+network_access = true
+
+# --- Profiles (replace contexts/) ---
+
+[profiles.dev]
+model = "o4-mini"
+approval_policy = "on-failure"
+model_personality = "pragmatic"
+
+[profiles.review]
+model = "o4-mini"
+approval_policy = "untrusted"
+model_personality = "pragmatic"
+
+[profiles.research]
+model = "o4-mini"
+web_search = "live"
+model_personality = "friendly"
+
+# --- MCP Servers ---
+# Enable servers by setting enabled = true and configuring env vars.
+# Keep under 10 MCPs enabled to preserve context window.
+
+[mcp_servers.github]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-github"]
+env = { GITHUB_PERSONAL_ACCESS_TOKEN = "${GITHUB_PAT}" }
+
+[mcp_servers.firecrawl]
+command = "npx"
+args = ["-y", "firecrawl-mcp"]
+env = { FIRECRAWL_API_KEY = "${FIRECRAWL_API_KEY}" }
+enabled = false
+
+[mcp_servers.supabase]
+command = "npx"
+args = ["-y", "@supabase/mcp-server-supabase@latest", "--project-ref=${SUPABASE_PROJECT_REF}"]
+enabled = false
+
+[mcp_servers.memory]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-memory"]
+enabled = false
+
+[mcp_servers.sequential-thinking]
+command = "npx"
+args = ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+enabled = false
+
+[mcp_servers.vercel]
+url = "https://mcp.vercel.com"
+enabled = false
+
+[mcp_servers.railway]
+command = "npx"
+args = ["-y", "@railway/mcp-server"]
+enabled = false
+
+[mcp_servers.context7]
+command = "npx"
+args = ["-y", "@context7/mcp-server"]
+enabled = false
+
+[mcp_servers.cloudflare-docs]
+url = "https://docs.mcp.cloudflare.com/mcp"
+enabled = false
+
+[mcp_servers.cloudflare-workers-builds]
+url = "https://builds.mcp.cloudflare.com/mcp"
+enabled = false
+
+[mcp_servers.cloudflare-workers-bindings]
+url = "https://bindings.mcp.cloudflare.com/mcp"
+enabled = false
+
+[mcp_servers.cloudflare-observability]
+url = "https://observability.mcp.cloudflare.com/mcp"
+enabled = false
+
+[mcp_servers.clickhouse]
+url = "https://mcp.clickhouse.cloud/mcp"
+enabled = false
+
+[mcp_servers.magic]
+command = "npx"
+args = ["-y", "@magicuidesign/mcp@latest"]
+enabled = false
