@@ -1,5 +1,5 @@
 /**
- * Cross-platform utility functions for Claude Code hooks and scripts
+ * Cross-platform utility functions for Codex CLI scripts
  * Works on Windows, macOS, and Linux
  */
 
@@ -214,7 +214,7 @@ async function readStdinJson() {
 }
 
 /**
- * Log to stderr (visible to user in Claude Code)
+ * Log to stderr (visible to user in Codex CLI)
  */
 function log(message) {
   console.error(message);
