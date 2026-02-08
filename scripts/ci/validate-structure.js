@@ -28,6 +28,8 @@ const forbiddenPaths = [
   '.opencode',
   'hooks/hooks.json',
   'contexts',
+  'agents',
+  'commands',
 ];
 
 let hasErrors = false;

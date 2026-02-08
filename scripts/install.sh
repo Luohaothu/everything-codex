@@ -59,7 +59,7 @@ fi
 for lang in golang python typescript; do
     mkdir -p "$CODEX_DIR/$lang"
     if [ -f "$CODEX_DIR/$lang/AGENTS.md" ]; then
-        echo "Existing $lang/AGENTS.md, skipping (use --force to overwrite)"
+        echo "Existing $lang/AGENTS.md, skipping"
     else
         cp "$PROJECT_DIR/$lang/AGENTS.md" "$CODEX_DIR/$lang/AGENTS.md"
         echo "Installed $lang/AGENTS.md"
@@ -104,6 +104,8 @@ fi
 
 echo ""
 echo "Installation complete!"
-echo "Backup at: $BACKUP_DIR"
+if [ -d "$BACKUP_DIR" ]; then
+    echo "Backup at: $BACKUP_DIR"
+    echo "To rollback: $(dirname "$0")/uninstall.sh --rollback"
+fi
 echo "To uninstall: $(dirname "$0")/uninstall.sh"
-echo "To rollback: $0 --rollback"

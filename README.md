@@ -106,7 +106,6 @@ everything-codex/
 |   |-- evolve/                   # Cluster instincts into skills
 |   |-- setup-pm/                 # Package manager configuration
 |   |-- project-guidelines-example/ # Example project guidelines
-|   |-- tdd-workflow/             # TDD methodology reference
 |
 |-- golang/                # Go project AGENTS.md template
 |-- python/                # Python project AGENTS.md template

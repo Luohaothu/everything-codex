@@ -57,17 +57,17 @@ function runTests() {
     assert.ok(fs.existsSync(home), 'Home dir should exist');
   })) passed++; else failed++;
 
-  if (test('getClaudeDir returns path under home', () => {
-    const claudeDir = utils.getClaudeDir();
+  if (test('getCodexDir returns path under home', () => {
+    const codexDir = utils.getCodexDir();
     const homeDir = utils.getHomeDir();
-    assert.ok(claudeDir.startsWith(homeDir), 'Claude dir should be under home');
-    assert.ok(claudeDir.includes('.claude'), 'Should contain .claude');
+    assert.ok(codexDir.startsWith(homeDir), 'Codex dir should be under home');
+    assert.ok(codexDir.includes('.codex'), 'Should contain .codex');
   })) passed++; else failed++;
 
-  if (test('getSessionsDir returns path under Claude dir', () => {
+  if (test('getSessionsDir returns path under Codex dir', () => {
     const sessionsDir = utils.getSessionsDir();
-    const claudeDir = utils.getClaudeDir();
-    assert.ok(sessionsDir.startsWith(claudeDir), 'Sessions should be under Claude dir');
+    const codexDir = utils.getCodexDir();
+    assert.ok(sessionsDir.startsWith(codexDir), 'Sessions should be under Codex dir');
     assert.ok(sessionsDir.includes('sessions'), 'Should contain sessions');
   })) passed++; else failed++;
 

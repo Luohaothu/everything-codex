@@ -130,7 +130,7 @@ jobs:
       - name: Run tests
         run: node tests/run-all.js
         env:
-          CLAUDE_CODE_PACKAGE_MANAGER: ${{ matrix.pm }}
+          CODEX_PACKAGE_MANAGER: ${{ matrix.pm }}
 
       # Upload test artifacts on failure
       - name: Upload test artifacts
@@ -155,18 +155,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-
-      - name: Validate agents
-        run: node scripts/ci/validate-agents.js
-        continue-on-error: false
-
-      - name: Validate hooks
-        run: node scripts/ci/validate-hooks.js
-        continue-on-error: false
-
-      - name: Validate commands
-        run: node scripts/ci/validate-commands.js
-        continue-on-error: false
 
       - name: Validate skills
         run: node scripts/ci/validate-skills.js
@@ -215,4 +203,4 @@ jobs:
         run: npx eslint scripts/**/*.js tests/**/*.js
 
       - name: Run markdownlint
-        run: npx markdownlint "agents/**/*.md" "skills/**/*.md" "commands/**/*.md" "rules/**/*.md"
+        run: npx markdownlint "skills/**/*.md" "rules/**/*.md"

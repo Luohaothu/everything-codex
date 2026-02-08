@@ -7,7 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { commandExists, getClaudeDir, readFile, writeFile } = require('./utils');
+const { commandExists, getCodexDir, readFile, writeFile } = require('./utils');
 
 // Package manager definitions
 const PACKAGE_MANAGERS = {
@@ -58,7 +58,7 @@ const DETECTION_PRIORITY = ['pnpm', 'bun', 'yarn', 'npm'];
 
 // Config file path
 function getConfigPath() {
-  return path.join(getClaudeDir(), 'package-manager.json');
+  return path.join(getCodexDir(), 'package-manager.json');
 }
 
 /**
@@ -168,7 +168,7 @@ function getPackageManager(options = {}) {
   }
 
   // 2. Check project-specific config
-  const projectConfigPath = path.join(projectDir, '.claude', 'package-manager.json');
+  const projectConfigPath = path.join(projectDir, '.codex', 'package-manager.json');
   const projectConfig = readFile(projectConfigPath);
   if (projectConfig) {
     try {
@@ -259,7 +259,7 @@ function setProjectPackageManager(pmName, projectDir = process.cwd()) {
     throw new Error(`Unknown package manager: ${pmName}`);
   }
 
-  const configDir = path.join(projectDir, '.claude');
+  const configDir = path.join(projectDir, '.codex');
   const configPath = path.join(configDir, 'package-manager.json');
 
   const config = {
