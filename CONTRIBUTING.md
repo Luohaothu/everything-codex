@@ -1,47 +1,39 @@
-# Contributing to Everything Claude Code
+# Contributing to everything-codex
 
-Thanks for wanting to contribute! This repo is a community resource for Claude Code users.
+Thanks for wanting to contribute! This repo is a community resource for Codex CLI users.
 
 ## Table of Contents
 
 - [What We're Looking For](#what-were-looking-for)
 - [Quick Start](#quick-start)
 - [Contributing Skills](#contributing-skills)
-- [Contributing Agents](#contributing-agents)
-- [Contributing Hooks](#contributing-hooks)
-- [Contributing Commands](#contributing-commands)
+- [Contributing AGENTS.md Templates](#contributing-agentsmd-templates)
+- [Contributing Execution Policies](#contributing-execution-policies)
 - [Pull Request Process](#pull-request-process)
 
 ---
 
 ## What We're Looking For
 
-### Agents
-New agents that handle specific tasks well:
-- Language-specific reviewers (Python, Go, Rust)
-- Framework experts (Django, Rails, Laravel, Spring)
-- DevOps specialists (Kubernetes, Terraform, CI/CD)
-- Domain experts (ML pipelines, data engineering, mobile)
-
 ### Skills
 Workflow definitions and domain knowledge:
-- Language best practices
-- Framework patterns
-- Testing strategies
-- Architecture guides
+- Language best practices (Rust, C#, Swift, Kotlin)
+- Framework patterns (Rails, Laravel, FastAPI, NestJS)
+- Testing strategies (visual regression, load testing)
+- DevOps workflows (Kubernetes, Terraform, CI/CD)
+- Domain expertise (ML pipelines, data engineering, mobile)
 
-### Hooks
-Useful automations:
-- Linting/formatting hooks
-- Security checks
-- Validation hooks
-- Notification hooks
+### AGENTS.md Templates
+Language or framework-specific AGENTS.md templates:
+- New language templates (e.g., `rust/AGENTS.md`)
+- Framework-specific guidelines
+- Team workflow standards
 
-### Commands
-Slash commands that invoke useful workflows:
-- Deployment commands
-- Testing commands
-- Code generation commands
+### Execution Policies
+Starlark `.rules` files for safety and enforcement:
+- Language-specific safety rules
+- Framework-specific restrictions
+- CI/CD guardrails
 
 ---
 
@@ -49,8 +41,8 @@ Slash commands that invoke useful workflows:
 
 ```bash
 # 1. Fork and clone
-gh repo fork affaan-m/everything-claude-code --clone
-cd everything-claude-code
+gh repo fork affaan-m/everything-codex --clone
+cd everything-codex
 
 # 2. Create a branch
 git checkout -b feat/my-contribution
@@ -58,8 +50,8 @@ git checkout -b feat/my-contribution
 # 3. Add your contribution (see sections below)
 
 # 4. Test locally
-cp -r skills/my-skill ~/.claude/skills/  # for skills
-# Then test with Claude Code
+./scripts/install.sh   # Install to verify
+# Then test with Codex CLI
 
 # 5. Submit PR
 git add . && git commit -m "feat: add my-skill" && git push
@@ -69,14 +61,14 @@ git add . && git commit -m "feat: add my-skill" && git push
 
 ## Contributing Skills
 
-Skills are knowledge modules that Claude Code loads based on context.
+Skills are the primary way to add knowledge and workflows to Codex CLI.
 
 ### Directory Structure
 
 ```
 skills/
-└── your-skill-name/
-    └── SKILL.md
+|-- your-skill-name/
+    |-- SKILL.md
 ```
 
 ### SKILL.md Template
@@ -115,235 +107,102 @@ function example() {
 Describe scenarios where this skill applies.
 ```
 
+### SKILL.md Format Rules
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `name` | Yes | Lowercase, hyphenated (matches directory name) |
+| `description` | Yes | One line, shown in skill list |
+| `tools` | No | Do NOT include — Codex does not support this field |
+| `model` | No | Do NOT include — Codex does not support this field |
+
+### Behavioral Constraints
+
+If your skill needs to restrict what Codex does (read-only review, no file writes), express it as text in the skill body:
+
+```markdown
+## Behavioral Constraints
+
+- This is a READ-ONLY review skill
+- Do NOT modify any files directly
+- Present findings as a report for the user to act on
+```
+
 ### Skill Checklist
 
+- [ ] Has YAML frontmatter with `name` and `description`
+- [ ] No `tools` or `model` fields in frontmatter
 - [ ] Focused on one domain/technology
 - [ ] Includes practical code examples
 - [ ] Under 500 lines
 - [ ] Uses clear section headers
-- [ ] Tested with Claude Code
-
-### Example Skills
-
-| Skill | Purpose |
-|-------|---------|
-| `coding-standards/` | TypeScript/JavaScript patterns |
-| `frontend-patterns/` | React and Next.js best practices |
-| `backend-patterns/` | API and database patterns |
-| `security-review/` | Security checklist |
+- [ ] Tested with Codex CLI
 
 ---
 
-## Contributing Agents
+## Contributing AGENTS.md Templates
 
-Agents are specialized assistants invoked via the Task tool.
+AGENTS.md files provide always-on instructions to Codex. We maintain language-specific templates.
 
-### File Location
+### Adding a New Language Template
 
-```
-agents/your-agent-name.md
-```
+1. Create `<language>/AGENTS.md` in the repo root
+2. Include:
+   - Project detection (what files indicate this language)
+   - Core coding standards for the language
+   - References to relevant skills via `/skill-name`
+   - Testing requirements specific to the language
 
-### Agent Template
+### Template Structure
 
 ```markdown
----
-name: your-agent-name
-description: What this agent does and when Claude should invoke it. Be specific!
-tools: ["Read", "Write", "Edit", "Bash", "Grep", "Glob"]
-model: sonnet
----
+# <Language> Development Standards
 
-You are a [role] specialist.
+## When to Apply
+This template applies when the project contains <detection files>.
 
-## Your Role
+## Coding Standards
+[Language-specific standards]
 
-- Primary responsibility
-- Secondary responsibility
-- What you DO NOT do (boundaries)
+## Testing
+[Language-specific testing requirements]
 
-## Workflow
-
-### Step 1: Understand
-How you approach the task.
-
-### Step 2: Execute
-How you perform the work.
-
-### Step 3: Verify
-How you validate results.
-
-## Output Format
-
-What you return to the user.
-
-## Examples
-
-### Example: [Scenario]
-Input: [what user provides]
-Action: [what you do]
-Output: [what you return]
+## Available Skills
+- `/language-patterns` - Idioms and best practices
+- `/language-testing` - Testing patterns
+- `/language-review` - Code review
 ```
 
-### Agent Fields
-
-| Field | Description | Options |
-|-------|-------------|---------|
-| `name` | Lowercase, hyphenated | `code-reviewer` |
-| `description` | Used to decide when to invoke | Be specific! |
-| `tools` | Only what's needed | `Read, Write, Edit, Bash, Grep, Glob, WebFetch, Task` |
-| `model` | Complexity level | `haiku` (simple), `sonnet` (coding), `opus` (complex) |
-
-### Example Agents
-
-| Agent | Purpose |
-|-------|---------|
-| `tdd-guide.md` | Test-driven development |
-| `code-reviewer.md` | Code review |
-| `security-reviewer.md` | Security scanning |
-| `build-error-resolver.md` | Fix build errors |
-
 ---
 
-## Contributing Hooks
+## Contributing Execution Policies
 
-Hooks are automatic behaviors triggered by Claude Code events.
+Starlark `.rules` files define what Codex can and cannot do.
 
 ### File Location
 
 ```
-hooks/hooks.json
+rules/<name>.rules
 ```
 
-### Hook Types
+### Rules Format
 
-| Type | Trigger | Use Case |
-|------|---------|----------|
-| `PreToolUse` | Before tool runs | Validate, warn, block |
-| `PostToolUse` | After tool runs | Format, check, notify |
-| `SessionStart` | Session begins | Load context |
-| `Stop` | Session ends | Cleanup, audit |
-
-### Hook Format
-
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "tool == \"Bash\" && tool_input.command matches \"rm -rf /\"",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo '[Hook] BLOCKED: Dangerous command' && exit 1"
-          }
-        ],
-        "description": "Block dangerous rm commands"
-      }
-    ]
-  }
-}
+```python
+# description of the rule
+prefix_rule(
+    pattern=["dangerous-command"],
+    decision="forbidden",
+    justification="Why this is blocked"
+)
 ```
 
-### Matcher Syntax
+### Decision Types
 
-```javascript
-// Match specific tools
-tool == "Bash"
-tool == "Edit"
-tool == "Write"
-
-// Match input patterns
-tool_input.command matches "npm install"
-tool_input.file_path matches "\\.tsx?$"
-
-// Combine conditions
-tool == "Bash" && tool_input.command matches "git push"
-```
-
-### Hook Examples
-
-```json
-// Block dev servers outside tmux
-{
-  "matcher": "tool == \"Bash\" && tool_input.command matches \"npm run dev\"",
-  "hooks": [{"type": "command", "command": "echo 'Use tmux for dev servers' && exit 1"}],
-  "description": "Ensure dev servers run in tmux"
-}
-
-// Auto-format after editing TypeScript
-{
-  "matcher": "tool == \"Edit\" && tool_input.file_path matches \"\\.tsx?$\"",
-  "hooks": [{"type": "command", "command": "npx prettier --write \"$file_path\""}],
-  "description": "Format TypeScript files after edit"
-}
-
-// Warn before git push
-{
-  "matcher": "tool == \"Bash\" && tool_input.command matches \"git push\"",
-  "hooks": [{"type": "command", "command": "echo '[Hook] Review changes before pushing'"}],
-  "description": "Reminder to review before push"
-}
-```
-
-### Hook Checklist
-
-- [ ] Matcher is specific (not overly broad)
-- [ ] Includes clear error/info messages
-- [ ] Uses correct exit codes (`exit 1` blocks, `exit 0` allows)
-- [ ] Tested thoroughly
-- [ ] Has description
-
----
-
-## Contributing Commands
-
-Commands are user-invoked actions with `/command-name`.
-
-### File Location
-
-```
-commands/your-command.md
-```
-
-### Command Template
-
-```markdown
----
-description: Brief description shown in /help
----
-
-# Command Name
-
-## Purpose
-
-What this command does.
-
-## Usage
-
-\`\`\`
-/your-command [args]
-\`\`\`
-
-## Workflow
-
-1. First step
-2. Second step
-3. Final step
-
-## Output
-
-What the user receives.
-```
-
-### Example Commands
-
-| Command | Purpose |
-|---------|---------|
-| `commit.md` | Create git commits |
-| `code-review.md` | Review code changes |
-| `tdd.md` | TDD workflow |
-| `e2e.md` | E2E testing |
+| Decision | Effect |
+|----------|--------|
+| `allow` | Automatically approve |
+| `prompt` | Ask user for confirmation |
+| `forbidden` | Block the action |
 
 ---
 
@@ -353,10 +212,9 @@ What the user receives.
 
 ```
 feat(skills): add rust-patterns skill
-feat(agents): add api-designer agent
-feat(hooks): add auto-format hook
-fix(skills): update React patterns
+feat(rules): add docker-safety execution policy
 docs: improve contributing guide
+fix(skills): update React patterns
 ```
 
 ### 2. PR Description
@@ -367,16 +225,17 @@ What you're adding and why.
 
 ## Type
 - [ ] Skill
-- [ ] Agent
-- [ ] Hook
-- [ ] Command
+- [ ] AGENTS.md template
+- [ ] Execution policy (.rules)
+- [ ] Documentation
 
 ## Testing
-How you tested this.
+How you tested this with Codex CLI.
 
 ## Checklist
-- [ ] Follows format guidelines
-- [ ] Tested with Claude Code
+- [ ] SKILL.md has valid frontmatter (name + description only)
+- [ ] No Claude Code references (use "Codex" terminology)
+- [ ] Tested with Codex CLI
 - [ ] No sensitive info (API keys, paths)
 - [ ] Clear descriptions
 ```
@@ -400,7 +259,8 @@ How you tested this.
 
 ### Don't
 - Include sensitive data (API keys, tokens, paths)
-- Add overly complex or niche configs
+- Add `tools` or `model` to SKILL.md frontmatter
+- Include Claude Code-specific references (hooks, plugins, etc.)
 - Submit untested contributions
 - Create duplicates of existing functionality
 
@@ -408,17 +268,16 @@ How you tested this.
 
 ## File Naming
 
-- Use lowercase with hyphens: `python-reviewer.md`
-- Be descriptive: `tdd-workflow.md` not `workflow.md`
-- Match name to filename
+- Use lowercase with hyphens: `python-patterns`
+- Be descriptive: `tdd-workflow` not `workflow`
+- Directory name must match `name` field in SKILL.md
 
 ---
 
 ## Questions?
 
-- **Issues:** [github.com/affaan-m/everything-claude-code/issues](https://github.com/affaan-m/everything-claude-code/issues)
-- **X/Twitter:** [@affaanmustafa](https://x.com/affaanmustafa)
+- **Issues:** [github.com/affaan-m/everything-codex/issues](https://github.com/affaan-m/everything-codex/issues)
 
 ---
 
-Thanks for contributing! Let's build a great resource together.
+Thanks for contributing!

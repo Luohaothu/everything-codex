@@ -2,48 +2,70 @@
 
 ## Structure
 
-Rules are organized into a **common** layer plus **language-specific** directories:
+Rules are organized into **execution policies** (`.rules` files) plus **markdown guidelines** in language-specific directories:
 
 ```
 rules/
-├── common/          # Language-agnostic principles (always install)
-│   ├── coding-style.md
-│   ├── git-workflow.md
-│   ├── testing.md
-│   ├── performance.md
-│   ├── patterns.md
-│   ├── hooks.md
-│   ├── agents.md
-│   └── security.md
-├── typescript/      # TypeScript/JavaScript specific
-├── python/          # Python specific
-└── golang/          # Go specific
+|-- safety.rules           # Core safety execution policy
+|-- git-safety.rules       # Git operation safety rules
+|-- file-hygiene.rules     # File cleanliness rules
+|-- common/                # Language-agnostic markdown guidelines
+|   |-- coding-style.md
+|   |-- git-workflow.md
+|   |-- testing.md
+|   |-- performance.md
+|   |-- patterns.md
+|   |-- security.md
+|-- typescript/            # TypeScript/JavaScript specific
+|-- python/                # Python specific
+|-- golang/                # Go specific
 ```
 
+### Execution Policies (`.rules`)
+
+Starlark files that define what Codex can and cannot do. These are enforced at the CLI level.
+
+```python
+# safety.rules
+prefix_rule(
+    pattern=["rm -rf /", "rm -rf ~"],
+    decision="forbidden",
+    justification="Prevent destructive system commands"
+)
+```
+
+Installed to: `~/.codex/rules/`
+
+### Markdown Guidelines
+
+Language-agnostic principles in `common/` plus language-specific extensions. These are referenced by AGENTS.md and skills.
+
 - **common/** contains universal principles — no language-specific code examples.
-- **Language directories** extend the common rules with framework-specific patterns, tools, and code examples. Each file references its common counterpart.
+- **Language directories** extend the common rules with framework-specific patterns, tools, and code examples.
 
 ## Installation
 
 ```bash
-# Install common rules (required for all projects)
-cp -r rules/common/* ~/.claude/rules/
+# Via install.sh (recommended)
+./scripts/install.sh
 
-# Install language-specific rules based on your project's tech stack
-cp -r rules/typescript/* ~/.claude/rules/
-cp -r rules/python/* ~/.claude/rules/
-cp -r rules/golang/* ~/.claude/rules/
+# Manual: Copy execution policies
+cp rules/*.rules ~/.codex/rules/
 
-# Attention ! ! ! Configure according to your actual project requirements; the configuration here is for reference only.
-
+# Manual: Copy markdown guidelines (for reference, typically loaded via skills)
+cp -r rules/common/* ~/.codex/rules/
+cp -r rules/typescript/* ~/.codex/rules/   # pick your stack
+cp -r rules/python/* ~/.codex/rules/
+cp -r rules/golang/* ~/.codex/rules/
 ```
 
 ## Rules vs Skills
 
-- **Rules** define standards, conventions, and checklists that apply broadly (e.g., "80% test coverage", "no hardcoded secrets").
-- **Skills** (`skills/` directory) provide deep, actionable reference material for specific tasks (e.g., `python-patterns`, `golang-testing`).
+- **Rules** (`.rules` files) define hard enforcement policies that Codex applies automatically.
+- **Markdown rules** define standards, conventions, and checklists referenced by AGENTS.md.
+- **Skills** (`skills/` directory) provide deep, actionable reference material for specific tasks.
 
-Language-specific rule files reference relevant skills where appropriate. Rules tell you *what* to do; skills tell you *how* to do it.
+Rules tell Codex what is *forbidden*. AGENTS.md tells Codex *how to behave*. Skills tell Codex *how to do things*.
 
 ## Adding a New Language
 
@@ -54,10 +76,10 @@ To add support for a new language (e.g., `rust/`):
    - `coding-style.md` — formatting tools, idioms, error handling patterns
    - `testing.md` — test framework, coverage tools, test organization
    - `patterns.md` — language-specific design patterns
-   - `hooks.md` — PostToolUse hooks for formatters, linters, type checkers
    - `security.md` — secret management, security scanning tools
 3. Each file should start with:
    ```
    > This file extends [common/xxx.md](../common/xxx.md) with <Language> specific content.
    ```
-4. Reference existing skills if available, or create new ones under `skills/`.
+4. Optionally create a consolidated `skills/<language>-rules/SKILL.md` skill.
+5. Create a `<language>/AGENTS.md` template in the repo root.
