@@ -6,7 +6,7 @@
 ![Shell](https://img.shields.io/badge/-Shell-4EAA25?logo=gnu-bash&logoColor=white)
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?logo=markdown&logoColor=white)
 
-> **61 skills** | **6 languages supported** | **Starlark execution policies** | **Hierarchical AGENTS.md**
+> **61 skills** | **6 workflows** | **6 languages supported** | **Starlark execution policies** | **Hierarchical AGENTS.md**
 
 ---
 
@@ -33,7 +33,7 @@ cd everything-codex
 /security-review
 ```
 
-The installer copies skills to `~/.agents/skills/`, rules to `~/.codex/rules/`, and AGENTS.md to `~/.codex/AGENTS.md` with backup and merge support.
+The installer copies skills to `~/.agents/skills/`, rules to `~/.codex/rules/`, workflows to `~/.codex/workflows/`, prompts to `~/.codex/prompts/`, and AGENTS.md to `~/.codex/AGENTS.md` with backup and merge support.
 
 ---
 
@@ -43,6 +43,7 @@ The installer copies skills to `~/.agents/skills/`, rules to `~/.codex/rules/`, 
 everything-codex/
 |-- AGENTS.md              # Root AGENTS.md with coding standards
 |-- config.toml            # Codex CLI configuration with profiles + MCP servers
+|-- llms.txt               # Machine-readable project context for AI tools
 |
 |-- skills/                # 61 skills (workflow definitions + domain knowledge)
 |   |-- plan/                     # Implementation planning
@@ -106,6 +107,18 @@ everything-codex/
 |   |-- evolve/                   # Cluster instincts into skills
 |   |-- setup-pm/                 # Package manager configuration
 |   |-- project-guidelines-example/ # Example project guidelines
+|
+|-- workflows/             # Execution playbooks combining skills
+|   |-- plan.md                   # Structured planning process
+|   |-- tdd.md                    # Test-driven development cycle
+|   |-- code-review.md            # Review process with severity levels
+|   |-- orchestrate.md            # End-to-end feature workflow
+|   |-- refactor-clean.md         # Safe dead-code removal
+|   |-- verify.md                 # Pre-commit / pre-PR gate
+|
+|-- prompts/               # Reusable output templates
+|   |-- plan-template.md          # Plan document structure
+|   |-- review-template.md        # Review findings structure
 |
 |-- golang/                # Go project AGENTS.md template
 |-- python/                # Python project AGENTS.md template
@@ -265,6 +278,32 @@ Language patterns, framework best practices, and testing strategies for TypeScri
 
 ---
 
+## Workflows
+
+Workflows are higher-level execution playbooks that combine skills into end-to-end processes. They live in `workflows/` and describe **when** and **how** to apply skills in sequence.
+
+| Workflow | Purpose |
+|----------|---------|
+| `plan.md` | Structured planning process with output contract |
+| `tdd.md` | RED/GREEN/REFACTOR cycle with coverage targets |
+| `code-review.md` | Review priorities and severity classification |
+| `orchestrate.md` | End-to-end feature flow (plan → tdd → review → verify) |
+| `refactor-clean.md` | Safe dead-code removal with validation steps |
+| `verify.md` | Pre-commit and pre-PR verification gate |
+
+**Skills vs Workflows:** Skills define _what_ to do (domain knowledge, behavioral constraints). Workflows define _when_ and _in what order_ to apply skills.
+
+### Prompt Templates
+
+Reusable output templates in `prompts/` ensure consistent formatting:
+
+| Template | Purpose |
+|----------|---------|
+| `plan-template.md` | Structured plan document with phases, risks, rollback |
+| `review-template.md` | Review findings with severity levels and verification |
+
+---
+
 ## Ecosystem Tools
 
 ### Skill Creator
@@ -312,6 +351,8 @@ The installer:
 - Offers merge strategies for existing AGENTS.md (append/include/replace/skip/dry-run)
 - Copies 61 skills to `~/.agents/skills/`
 - Copies execution policies to `~/.codex/rules/`
+- Copies workflow playbooks to `~/.codex/workflows/`
+- Copies prompt templates to `~/.codex/prompts/`
 - Records a manifest for clean uninstall
 
 ### Manual
@@ -327,6 +368,10 @@ cp -r everything-codex/skills/* ~/.agents/skills/
 
 # Copy execution policies
 cp everything-codex/rules/*.rules ~/.codex/rules/
+
+# Copy workflows and prompts
+cp -r everything-codex/workflows/* ~/.codex/workflows/
+cp -r everything-codex/prompts/* ~/.codex/prompts/
 
 # Copy language-specific AGENTS.md (pick your stack)
 cp everything-codex/golang/AGENTS.md ~/.codex/golang/AGENTS.md

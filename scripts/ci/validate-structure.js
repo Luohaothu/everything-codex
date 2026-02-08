@@ -17,6 +17,8 @@ const requiredFiles = [
 const requiredDirs = [
   'skills',
   'rules',
+  'workflows',
+  'prompts',
   'golang',
   'python',
   'typescript',

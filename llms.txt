@@ -1,0 +1,60 @@
+# everything-codex
+
+> A comprehensive configuration toolkit for OpenAI Codex CLI.
+
+## Project Structure
+
+- `AGENTS.md` -- repository-wide operating rules and coding standards
+- `config.toml` -- Codex CLI configuration with profiles and MCP servers
+- `skills/` -- 61 reusable skills (workflow definitions + domain knowledge)
+- `workflows/` -- execution playbooks combining skills into end-to-end processes
+- `prompts/` -- fill-in-the-blank templates for consistent outputs
+- `rules/` -- Starlark execution policies + language-specific markdown rules
+- `golang/` / `python/` / `typescript/` -- language-specific AGENTS.md templates
+- `scripts/install.sh` -- installer with backup, merge strategies, and manifest tracking
+- `scripts/uninstall.sh` -- manifest-based uninstall with rollback support
+
+## Key Skills
+
+| Skill | Purpose |
+|-------|---------|
+| `/plan` | Implementation planning with risk assessment |
+| `/tdd` | Test-driven development (RED/GREEN/REFACTOR) |
+| `/code-review` | Quality, security, and maintainability review |
+| `/security-review` | Vulnerability analysis and OWASP checklist |
+| `/verify` | Build/lint/test/security verification loop |
+| `/orchestrate` | Sequential skill workflow for full features |
+| `/architect` | System design and architectural review |
+| `/build-fix` | Fix build errors with minimal diffs |
+
+## Key Commands
+
+```bash
+# Install
+./scripts/install.sh
+
+# Validate structure and skills
+npm run validate
+
+# Run tests
+npm test
+
+# Lint
+npm run lint
+```
+
+## Workflows
+
+Workflows are higher-level playbooks in `workflows/`:
+- `plan.md` -- structured planning process
+- `tdd.md` -- test-driven development cycle
+- `code-review.md` -- review process with severity levels
+- `orchestrate.md` -- end-to-end feature workflow
+- `refactor-clean.md` -- safe dead-code removal
+- `verify.md` -- pre-commit and pre-PR verification gate
+
+## Non-Goals
+
+- No Claude Code plugin integration
+- No OpenCode integration
+- No compatibility layer for legacy agent ecosystems

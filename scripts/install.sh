@@ -94,15 +94,33 @@ for rules_file in "$PROJECT_DIR"/rules/*.rules; do
 done
 echo "Installed execution policy rules"
 
-# 5. Config examples
+# 5. Workflows → ~/.codex/workflows/
+mkdir -p "$CODEX_DIR/workflows"
+for wf in "$PROJECT_DIR"/workflows/*.md; do
+    dest="$CODEX_DIR/workflows/$(basename "$wf")"
+    cp "$wf" "$dest"
+    echo "$dest" >> "$INSTALL_MANIFEST"
+done
+echo "Installed workflow playbooks"
+
+# 6. Prompts → ~/.codex/prompts/
+mkdir -p "$CODEX_DIR/prompts"
+for pt in "$PROJECT_DIR"/prompts/*.md; do
+    dest="$CODEX_DIR/prompts/$(basename "$pt")"
+    cp "$pt" "$dest"
+    echo "$dest" >> "$INSTALL_MANIFEST"
+done
+echo "Installed prompt templates"
+
+# 7. Config examples
 cp "$PROJECT_DIR/config.toml" "$CODEX_DIR/config.toml.example"
 echo "$CODEX_DIR/config.toml.example" >> "$INSTALL_MANIFEST"
 echo "Installed config.toml.example"
 
-# 6. Finalize manifest
+# 8. Finalize manifest
 echo "Manifest written to $INSTALL_MANIFEST ($(wc -l < "$INSTALL_MANIFEST" | tr -d ' ') files)"
 
-# 7. Post-install verification
+# 9. Post-install verification
 echo ""
 echo "Running verification..."
 if command -v codex &>/dev/null; then

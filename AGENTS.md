@@ -76,6 +76,26 @@ NEVER hardcode secrets. ALWAYS use environment variables or a secret manager. Va
 
 If a security issue is found: STOP -> use `/security-review` skill -> fix CRITICAL issues -> rotate exposed secrets -> review for similar issues.
 
+## Workflows & Prompts
+
+Reusable execution playbooks live in `workflows/`. Use them to follow a structured process:
+
+| Workflow | Purpose |
+|----------|---------|
+| `workflows/plan.md` | Structured planning process |
+| `workflows/tdd.md` | Test-driven development cycle |
+| `workflows/code-review.md` | Review process with severity levels |
+| `workflows/orchestrate.md` | End-to-end feature workflow |
+| `workflows/refactor-clean.md` | Safe dead-code removal |
+| `workflows/verify.md` | Pre-commit / pre-PR verification gate |
+
+Fill-in-the-blank templates live in `prompts/`:
+
+| Template | Purpose |
+|----------|---------|
+| `prompts/plan-template.md` | Structured plan output |
+| `prompts/review-template.md` | Code review findings |
+
 ## Available Skills
 
 Use skills with `/skill-name` in Codex. Key skills:
