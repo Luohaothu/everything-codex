@@ -60,8 +60,8 @@
 ### 1. Fork 儲存庫
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/everything-claude-code.git
-cd everything-claude-code
+git clone https://github.com/YOUR_USERNAME/everything-codex.git
+cd everything-codex
 ```
 
 ### 2. 建立分支

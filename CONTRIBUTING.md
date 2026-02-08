@@ -41,7 +41,7 @@ Starlark `.rules` files for safety and enforcement:
 
 ```bash
 # 1. Fork and clone
-gh repo fork affaan-m/everything-codex --clone
+gh repo fork Luohaothu/everything-codex --clone
 cd everything-codex
 
 # 2. Create a branch
@@ -276,7 +276,7 @@ How you tested this with Codex CLI.
 
 ## Questions?
 
-- **Issues:** [github.com/affaan-m/everything-codex/issues](https://github.com/affaan-m/everything-codex/issues)
+- **Issues:** [github.com/Luohaothu/everything-codex/issues](https://github.com/Luohaothu/everything-codex/issues)
 
 ---
 

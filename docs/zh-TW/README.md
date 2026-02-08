@@ -1,6 +1,6 @@
 # Everything Claude Code
 
-[![Stars](https://img.shields.io/github/stars/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/stargazers)
+[![Stars](https://img.shields.io/github/stars/Luohaothu/everything-codex?style=flat)](https://github.com/Luohaothu/everything-codex/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Shell](https://img.shields.io/badge/-Shell-4EAA25?logo=gnu-bash&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript&logoColor=white)
@@ -67,10 +67,10 @@
 
 ```bash
 # 新增市集
-/plugin marketplace add affaan-m/everything-claude-code
+/plugin marketplace add Luohaothu/everything-codex
 
 # 安裝外掛程式
-/plugin install everything-claude-code@everything-claude-code
+/plugin install everything-codex@everything-codex
 ```
 
 ### 第二步：安裝規則（必需）
@@ -79,10 +79,10 @@
 
 ```bash
 # 首先複製儲存庫
-git clone https://github.com/affaan-m/everything-claude-code.git
+git clone https://github.com/Luohaothu/everything-codex.git
 
 # 複製規則（應用於所有專案）
-cp -r everything-claude-code/rules/* ~/.claude/rules/
+cp -r everything-codex/rules/* ~/.claude/rules/
 ```
 
 ### 第三步：開始使用
@@ -92,7 +92,7 @@ cp -r everything-claude-code/rules/* ~/.claude/rules/
 /plan "新增使用者認證"
 
 # 查看可用指令
-/plugin list everything-claude-code@everything-claude-code
+/plugin list everything-codex@everything-codex
 ```
 
 ✨ **完成！** 您現在使用 15+ 代理程式、30+ 技能和 20+ 指令。
@@ -139,7 +139,7 @@ node scripts/setup-package-manager.js --detect
 本儲存庫是一個 **Claude Code 外掛程式** - 可直接安裝或手動複製元件。
 
 ```
-everything-claude-code/
+everything-codex/
 |-- .claude-plugin/   # 外掛程式和市集清單
 |   |-- plugin.json         # 外掛程式中繼資料和元件路徑
 |   |-- marketplace.json    # 用於 /plugin marketplace add 的市集目錄
@@ -264,10 +264,10 @@ everything-claude-code/
 
 ```bash
 # 將此儲存庫新增為市集
-/plugin marketplace add affaan-m/everything-claude-code
+/plugin marketplace add Luohaothu/everything-codex
 
 # 安裝外掛程式
-/plugin install everything-claude-code@everything-claude-code
+/plugin install everything-codex@everything-codex
 ```
 
 或直接新增到您的 `~/.claude/settings.json`：
@@ -275,15 +275,15 @@ everything-claude-code/
 ```json
 {
   "extraKnownMarketplaces": {
-    "everything-claude-code": {
+    "everything-codex": {
       "source": {
         "source": "github",
-        "repo": "affaan-m/everything-claude-code"
+        "repo": "Luohaothu/everything-codex"
       }
     }
   },
   "enabledPlugins": {
-    "everything-claude-code@everything-claude-code": true
+    "everything-codex@everything-codex": true
   }
 }
 ```
@@ -298,19 +298,19 @@ everything-claude-code/
 
 ```bash
 # 複製儲存庫
-git clone https://github.com/affaan-m/everything-claude-code.git
+git clone https://github.com/Luohaothu/everything-codex.git
 
 # 將代理程式複製到您的 Claude 設定
-cp everything-claude-code/agents/*.md ~/.claude/agents/
+cp everything-codex/agents/*.md ~/.claude/agents/
 
 # 複製規則
-cp everything-claude-code/rules/*.md ~/.claude/rules/
+cp everything-codex/rules/*.md ~/.claude/rules/
 
 # 複製指令
-cp everything-claude-code/commands/*.md ~/.claude/commands/
+cp everything-codex/commands/*.md ~/.claude/commands/
 
 # 複製技能
-cp -r everything-claude-code/skills/* ~/.claude/skills/
+cp -r everything-codex/skills/* ~/.claude/skills/
 ```
 
 #### 將鉤子新增到 settings.json
@@ -454,7 +454,7 @@ node tests/hooks/hooks.test.js
 
 ## 🌟 Star 歷史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=affaan-m/everything-claude-code&type=Date)](https://star-history.com/#affaan-m/everything-claude-code&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Luohaothu/everything-codex&type=Date)](https://star-history.com/#Luohaothu/everything-codex&Date)
 
 ---
 

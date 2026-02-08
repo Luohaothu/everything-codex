@@ -66,8 +66,8 @@
 ### 1. Fork 仓库
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/everything-claude-code.git
-cd everything-claude-code
+git clone https://github.com/YOUR_USERNAME/everything-codex.git
+cd everything-codex
 ```
 
 ### 2. 创建一个分支

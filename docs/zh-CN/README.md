@@ -2,7 +2,7 @@
 
 # Everything Claude Code
 
-[![Stars](https://img.shields.io/github/stars/affaan-m/everything-claude-code?style=flat)](https://github.com/affaan-m/everything-claude-code/stargazers)
+[![Stars](https://img.shields.io/github/stars/Luohaothu/everything-codex?style=flat)](https://github.com/Luohaothu/everything-codex/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Shell](https://img.shields.io/badge/-Shell-4EAA25?logo=gnu-bash\&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/-TypeScript-3178C6?logo=typescript\&logoColor=white)
@@ -69,10 +69,10 @@
 
 ```bash
 # Add marketplace
-/plugin marketplace add affaan-m/everything-claude-code
+/plugin marketplace add Luohaothu/everything-codex
 
 # Install plugin
-/plugin install everything-claude-code@everything-claude-code
+/plugin install everything-codex@everything-codex
 ```
 
 ### 步骤 2：安装规则（必需）
@@ -81,10 +81,10 @@
 
 ```bash
 # Clone the repo first
-git clone https://github.com/affaan-m/everything-claude-code.git
+git clone https://github.com/Luohaothu/everything-codex.git
 
 # Copy rules (applies to all projects)
-cp -r everything-claude-code/rules/* ~/.claude/rules/
+cp -r everything-codex/rules/* ~/.claude/rules/
 ```
 
 ### 步骤 3：开始使用
@@ -94,7 +94,7 @@ cp -r everything-claude-code/rules/* ~/.claude/rules/
 /plan "Add user authentication"
 
 # Check available commands
-/plugin list everything-claude-code@everything-claude-code
+/plugin list everything-codex@everything-codex
 ```
 
 ✨ **就这样！** 您现在可以访问 15+ 个代理、30+ 个技能和 20+ 个命令。
@@ -141,7 +141,7 @@ node scripts/setup-package-manager.js --detect
 此仓库是一个 **Claude Code 插件** - 可以直接安装或手动复制组件。
 
 ```
-everything-claude-code/
+everything-codex/
 |-- .claude-plugin/   # 插件和插件市场清单
 |   |-- plugin.json         # 插件元数据和组件路径
 |   |-- marketplace.json    # 用于 /plugin marketplace add 的市场目录
@@ -316,7 +316,7 @@ Claude Code v2.1+ **会自动加载** 任何已安装插件中的 `hooks/hooks.j
 Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded file
 ```
 
-**历史背景：** 这已导致此仓库中多次修复/还原循环（[#29](https://github.com/affaan-m/everything-claude-code/issues/29), [#52](https://github.com/affaan-m/everything-claude-code/issues/52), [#103](https://github.com/affaan-m/everything-claude-code/issues/103)）。Claude Code 版本之间的行为发生了变化，导致了混淆。我们现在有一个回归测试来防止这种情况再次发生。
+**历史背景：** 这已导致此仓库中多次修复/还原循环（[#29](https://github.com/Luohaothu/everything-codex/issues/29), [#52](https://github.com/Luohaothu/everything-codex/issues/52), [#103](https://github.com/Luohaothu/everything-codex/issues/103)）。Claude Code 版本之间的行为发生了变化，导致了混淆。我们现在有一个回归测试来防止这种情况再次发生。
 
 ***
 
@@ -328,10 +328,10 @@ Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded fil
 
 ```bash
 # Add this repo as a marketplace
-/plugin marketplace add affaan-m/everything-claude-code
+/plugin marketplace add Luohaothu/everything-codex
 
 # Install the plugin
-/plugin install everything-claude-code@everything-claude-code
+/plugin install everything-codex@everything-codex
 ```
 
 或者直接添加到您的 `~/.claude/settings.json`：
@@ -339,15 +339,15 @@ Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded fil
 ```json
 {
   "extraKnownMarketplaces": {
-    "everything-claude-code": {
+    "everything-codex": {
       "source": {
         "source": "github",
-        "repo": "affaan-m/everything-claude-code"
+        "repo": "Luohaothu/everything-codex"
       }
     }
   },
   "enabledPlugins": {
-    "everything-claude-code@everything-claude-code": true
+    "everything-codex@everything-codex": true
   }
 }
 ```
@@ -358,14 +358,14 @@ Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded fil
 >
 > ```bash
 > # 首先克隆仓库
-> git clone https://github.com/affaan-m/everything-claude-code.git
+> git clone https://github.com/Luohaothu/everything-codex.git
 >
 > # 选项 A：用户级规则（适用于所有项目）
-> cp -r everything-claude-code/rules/* ~/.claude/rules/
+> cp -r everything-codex/rules/* ~/.claude/rules/
 >
 > # 选项 B：项目级规则（仅适用于当前项目）
 > mkdir -p .claude/rules
-> cp -r everything-claude-code/rules/* .claude/rules/
+> cp -r everything-codex/rules/* .claude/rules/
 > ```
 
 ***
@@ -376,19 +376,19 @@ Duplicate hooks file detected: ./hooks/hooks.json resolves to already-loaded fil
 
 ```bash
 # Clone the repo
-git clone https://github.com/affaan-m/everything-claude-code.git
+git clone https://github.com/Luohaothu/everything-codex.git
 
 # Copy agents to your Claude config
-cp everything-claude-code/agents/*.md ~/.claude/agents/
+cp everything-codex/agents/*.md ~/.claude/agents/
 
 # Copy rules
-cp everything-claude-code/rules/*.md ~/.claude/rules/
+cp everything-codex/rules/*.md ~/.claude/rules/
 
 # Copy commands
-cp everything-claude-code/commands/*.md ~/.claude/commands/
+cp everything-codex/commands/*.md ~/.claude/commands/
 
 # Copy skills
-cp -r everything-claude-code/skills/* ~/.claude/skills/
+cp -r everything-codex/skills/* ~/.claude/skills/
 ```
 
 #### 将钩子添加到 settings.json
@@ -536,7 +536,7 @@ node tests/hooks/hooks.test.js
 
 ## 🌟 Star 历史
 
-[![Star History Chart](https://api.star-history.com/svg?repos=affaan-m/everything-claude-code\&type=Date)](https://star-history.com/#affaan-m/everything-claude-code\&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=Luohaothu/everything-codex\&type=Date)](https://star-history.com/#Luohaothu/everything-codex\&Date)
 
 ***
 
