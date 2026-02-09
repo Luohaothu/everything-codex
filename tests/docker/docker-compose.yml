@@ -1,0 +1,33 @@
+services:
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Keep CODEX_VERSION in sync with:
+        # - tests/docker/Dockerfile (ARG CODEX_VERSION default)
+        # - tests/docker/.env.example (CODEX_VERSION default)
+        CODEX_VERSION: ${CODEX_VERSION:-0.98.0}
+        TESTUSER_UID: ${TESTUSER_UID:-1001}
+        TESTUSER_GID: ${TESTUSER_GID:-1001}
+    volumes:
+      # Intentional read-only bind: tests must not mutate repository contents.
+      # Runtime writes should go to /home/testuser (named volume) or /tmp (tmpfs).
+      # Integration scenarios that need a writable workspace should copy sources first.
+      - ../../:/workspace:ro
+      - test-home:/home/testuser
+      - ./reports:/home/testuser/reports
+    environment:
+      - CODEX_API_KEY=${CODEX_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+      - CODEX_TEST_MODEL=${CODEX_TEST_MODEL:-o4-mini}
+      - CODEX_TEST_REASONING_EFFORT=${CODEX_TEST_REASONING_EFFORT:-}
+      - CODEX_TEST_TIMEOUT=${CODEX_TEST_TIMEOUT:-180}
+      - TEST_LAYER=${TEST_LAYER:-all}
+      - GITHUB_ACTIONS=${GITHUB_ACTIONS:-}
+    tmpfs:
+      - /tmp:size=512M
+
+volumes:
+  test-home:

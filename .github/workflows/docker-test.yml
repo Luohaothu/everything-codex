@@ -1,0 +1,123 @@
+name: Docker Integration Tests
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      test_layer:
+        description: Test layer to run
+        required: false
+        default: all
+        type: choice
+        options:
+          - all
+          - static
+          - lifecycle
+          - smoke
+          - integration
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare reports directory
+        run: mkdir -p tests/docker/reports
+
+      - name: Build test container
+        run: docker compose -f tests/docker/docker-compose.yml build --build-arg TESTUSER_UID=$(id -u) --build-arg TESTUSER_GID=$(id -g)
+
+      - name: Run baseline tests (static + lifecycle)
+        run: docker compose -f tests/docker/docker-compose.yml run --rm test-runner lifecycle
+        env:
+          CODEX_TEST_MODEL: o4-mini
+          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || '' }}
+          CODEX_TEST_TIMEOUT: '120'
+
+      - name: Upload baseline test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: baseline-test-reports
+          path: tests/docker/reports/
+
+  smoke:
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare reports directory
+        run: mkdir -p tests/docker/reports
+
+      - name: Build test container
+        run: docker compose -f tests/docker/docker-compose.yml build --build-arg TESTUSER_UID=$(id -u) --build-arg TESTUSER_GID=$(id -g)
+
+      - name: Run smoke tests (fallback to lifecycle baseline when API secrets are absent)
+        run: |
+          if [ -n "${CODEX_API_KEY:-}" ] || [ -n "${OPENAI_API_KEY:-}" ]; then
+            echo "API secrets detected. Running smoke suite (static + lifecycle + smoke integration)."
+            docker compose -f tests/docker/docker-compose.yml run --rm test-runner smoke
+          else
+            echo "API secrets are absent for this non-fork run. Falling back to lifecycle baseline (static + lifecycle)."
+            docker compose -f tests/docker/docker-compose.yml run --rm test-runner lifecycle
+          fi
+        env:
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          CODEX_TEST_MODEL: o4-mini
+          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || '' }}
+          CODEX_TEST_TIMEOUT: '120'
+
+      - name: Upload smoke test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test-reports
+          path: tests/docker/reports/
+
+  full:
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare reports directory
+        run: mkdir -p tests/docker/reports
+
+      - name: Build test container
+        run: docker compose -f tests/docker/docker-compose.yml build --build-arg TESTUSER_UID=$(id -u) --build-arg TESTUSER_GID=$(id -g)
+
+      - name: Run full tests
+        run: docker compose -f tests/docker/docker-compose.yml run --rm test-runner ${{ inputs.test_layer || 'all' }}
+        env:
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          CODEX_TEST_MODEL: o4-mini
+          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || '' }}
+          CODEX_TEST_TIMEOUT: '120'
+
+      - name: Upload full test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: full-test-reports
+          path: tests/docker/reports/

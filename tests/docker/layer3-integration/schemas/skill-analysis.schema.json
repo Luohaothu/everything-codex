@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Layer3 Skill Analysis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "skills_referenced",
+    "analysis_type",
+    "findings",
+    "actions_taken"
+  ],
+  "properties": {
+    "skills_referenced": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "analysis_type": {
+      "type": "string",
+      "enum": [
+        "code_review",
+        "planning",
+        "tdd",
+        "security",
+        "architecture",
+        "orchestration",
+        "learning",
+        "configuration"
+      ]
+    },
+    "findings": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "category",
+          "description",
+          "severity"
+        ],
+        "properties": {
+          "category": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          }
+        }
+      }
+    },
+    "actions_taken": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

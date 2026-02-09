@@ -1,0 +1,3 @@
+model = "o4-mini"
+sandbox_mode = "read-only"
+approval_policy = "never"
