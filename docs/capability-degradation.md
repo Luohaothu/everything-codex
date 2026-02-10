@@ -95,7 +95,7 @@ These features are new in `everything-codex` and did not exist in `everything-cl
 
 ### Expanded Skill Count
 
-**What was gained**: 61 skills (up from approximately 28 in v1.x). The increase comes from converting 13 agents and 18 standalone commands into skills, adding 3 language rules skills, and adding new utility skills (`configure-codex`, `multi-backend`, `multi-frontend`).
+**What was gained**: 62 skills (up from approximately 28 in v1.x). The increase comes from converting 13 agents and 18 standalone commands into skills, adding 3 language rules skills, and adding new utility skills (`configure-codex`, `multi-backend`, `multi-frontend`) plus focused workflows like `document-processing`.
 
 ### Clean Install/Uninstall with Backup
 
@@ -163,7 +163,7 @@ These capabilities were lost in the migration but have explicit workarounds or p
 | **Gained** | config.toml profiles | New | -- |
 | **Gained** | Language AGENTS.md templates | New | -- |
 | **Gained** | Language rules skills (3) | New | -- |
-| **Gained** | 61 skills (up from ~28) | Expanded | -- |
+| **Gained** | 62 skills (up from ~28) | Expanded | -- |
 | **Gained** | Clean install/uninstall with backup | New | -- |
 | **Mitigated** | Auto-formatting after edit | Degraded | AGENTS.md text + `check-format.sh` |
 | **Mitigated** | Debug statement detection | Degraded | AGENTS.md text + `check-console-log.sh` |

@@ -229,7 +229,7 @@ The `tools` and `model` fields are removed. Tool restrictions are expressed as b
 ├── rules/               (.md rule files)     ├── typescript/AGENTS.md   (TS rules template)
 ├── contexts/            (3 context files)    ├── config.toml            (profiles + MCP)
 ├── skills/              (29 skills)          ├── rules/                 (Starlark .rules)
-├── .claude-plugin/      (plugin system)      ├── skills/                (61 skills)
+├── .claude-plugin/      (plugin system)      ├── skills/                (62 skills)
 ├── mcp-configs/         (JSON MCP configs)   ├── scripts/ci/            (CI check scripts)
 ├── .opencode/           (OpenCode support)   ├── scripts/install.sh     (installer)
 └── README.zh-CN.md      (Chinese docs)       └── scripts/uninstall.sh   (uninstaller)

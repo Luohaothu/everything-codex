@@ -44,7 +44,7 @@ suite.test('codex helper defaults to gpt-5.3-codex when env is unset', () => {
 });
 
 suite.test('codex config defaults to gpt-5.3-codex', () => {
-  fileContains(CODEX_CONFIG_PATH, /model\s*=\s*\"gpt-5\.3-codex\"/);
+  fileContains(CODEX_CONFIG_PATH, /model\s*=\s*"gpt-5\.3-codex"/);
 });
 
 suite.test('entrypoint prints consistent defaults', () => {
@@ -53,4 +53,3 @@ suite.test('entrypoint prints consistent defaults', () => {
 });
 
 runAndExit(suite);
-
