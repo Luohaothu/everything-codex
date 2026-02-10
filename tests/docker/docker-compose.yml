@@ -18,11 +18,11 @@ services:
       - test-home:/home/testuser
       - ./reports:/home/testuser/reports
     environment:
-      - CODEX_API_KEY=${CODEX_API_KEY}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
-      - CODEX_TEST_MODEL=${CODEX_TEST_MODEL:-o4-mini}
-      - CODEX_TEST_REASONING_EFFORT=${CODEX_TEST_REASONING_EFFORT:-}
+      - CODEX_API_KEY=${CODEX_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL:-}
+      - CODEX_TEST_MODEL=${CODEX_TEST_MODEL:-gpt-5.3-codex}
+      - CODEX_TEST_REASONING_EFFORT=${CODEX_TEST_REASONING_EFFORT:-medium}
       - CODEX_TEST_TIMEOUT=${CODEX_TEST_TIMEOUT:-180}
       - TEST_LAYER=${TEST_LAYER:-all}
       - GITHUB_ACTIONS=${GITHUB_ACTIONS:-}

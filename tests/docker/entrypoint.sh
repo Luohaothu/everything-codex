@@ -367,8 +367,8 @@ echo "║        everything-codex Docker Integration Tests         ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 echo "Layer: $REQUESTED_LAYER"
-echo "Model: ${CODEX_TEST_MODEL:-o4-mini}"
-echo "Timeout: ${CODEX_TEST_TIMEOUT:-120}s"
+echo "Model: ${CODEX_TEST_MODEL:-gpt-5.3-codex}"
+echo "Timeout: ${CODEX_TEST_TIMEOUT:-180}s"
 echo ""
 
 case "$LAYER" in

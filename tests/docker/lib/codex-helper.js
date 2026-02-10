@@ -16,7 +16,7 @@ const TIMEOUT = Number.isFinite(timeoutSeconds) && timeoutSeconds > 0
   ? timeoutSeconds * 1000
   : DEFAULT_TIMEOUT_SECONDS * 1000;
 
-const MODEL = process.env.CODEX_TEST_MODEL || 'o4-mini';
+const MODEL = process.env.CODEX_TEST_MODEL || 'gpt-5.3-codex';
 const REASONING_EFFORT = (process.env.CODEX_TEST_REASONING_EFFORT || '').trim();
 const OUTPUT_SCHEMA_PATH = '/workspace/tests/docker/layer3-integration/schemas/skill-analysis.schema.json';
 const OUTPUT_SCHEMA_RELATIVE_PATH = path.join(
