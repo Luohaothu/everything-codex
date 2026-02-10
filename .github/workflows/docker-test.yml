@@ -29,7 +29,8 @@ permissions:
 
 jobs:
   baseline:
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == true }}
+    # Fork PRs cannot access repository secrets, so we run baseline (static + lifecycle) only.
+    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -56,7 +57,8 @@ jobs:
           path: tests/docker/reports/
 
   smoke:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork == false) }}
+    # Same-repo PRs can access secrets; for safety, we still fall back to lifecycle when secrets are absent.
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -74,7 +76,7 @@ jobs:
             echo "API secrets detected. Running smoke suite (static + lifecycle + smoke integration)."
             docker compose -f tests/docker/docker-compose.yml run --rm test-runner smoke
           else
-            echo "API secrets are absent for this non-fork run. Falling back to lifecycle baseline (static + lifecycle)."
+            echo "API secrets are absent for this run. Falling back to lifecycle baseline (static + lifecycle)."
             docker compose -f tests/docker/docker-compose.yml run --rm test-runner lifecycle
           fi
         env:
