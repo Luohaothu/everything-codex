@@ -110,4 +110,3 @@ Handle explicitly:
 - `/architect` for end-to-end pipeline design and interfaces
 - `/iterative-retrieval` when context must be gathered progressively
 - `/security-review` for threat modeling and sensitive-data handling
-
