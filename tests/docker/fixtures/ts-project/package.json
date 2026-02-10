@@ -1,0 +1,12 @@
+{
+  "name": "ts-test-project",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test src/**/*.test.ts"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
