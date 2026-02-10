@@ -45,9 +45,9 @@ jobs:
       - name: Run baseline tests (static + lifecycle)
         run: docker compose -f tests/docker/docker-compose.yml run --rm test-runner lifecycle
         env:
-          CODEX_TEST_MODEL: o4-mini
-          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || '' }}
-          CODEX_TEST_TIMEOUT: '120'
+          CODEX_TEST_MODEL: ${{ vars.CODEX_TEST_MODEL || 'gpt-5.3-codex' }}
+          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || 'medium' }}
+          CODEX_TEST_TIMEOUT: ${{ vars.CODEX_TEST_TIMEOUT || '180' }}
 
       - name: Upload baseline test reports
         uses: actions/upload-artifact@v4
@@ -83,9 +83,9 @@ jobs:
           CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
-          CODEX_TEST_MODEL: o4-mini
-          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || '' }}
-          CODEX_TEST_TIMEOUT: '120'
+          CODEX_TEST_MODEL: ${{ vars.CODEX_TEST_MODEL || 'gpt-5.3-codex' }}
+          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || 'medium' }}
+          CODEX_TEST_TIMEOUT: ${{ vars.CODEX_TEST_TIMEOUT || '180' }}
 
       - name: Upload smoke test reports
         uses: actions/upload-artifact@v4
@@ -113,9 +113,9 @@ jobs:
           CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
-          CODEX_TEST_MODEL: o4-mini
-          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || '' }}
-          CODEX_TEST_TIMEOUT: '120'
+          CODEX_TEST_MODEL: ${{ vars.CODEX_TEST_MODEL || 'gpt-5.3-codex' }}
+          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || 'medium' }}
+          CODEX_TEST_TIMEOUT: ${{ vars.CODEX_TEST_TIMEOUT || '180' }}
 
       - name: Upload full test reports
         uses: actions/upload-artifact@v4
