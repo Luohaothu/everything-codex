@@ -6,7 +6,7 @@
 ![Shell](https://img.shields.io/badge/-Shell-4EAA25?logo=gnu-bash&logoColor=white)
 ![Markdown](https://img.shields.io/badge/-Markdown-000000?logo=markdown&logoColor=white)
 
-> **61 skills** | **6 workflows** | **6 languages supported** | **Starlark execution policies** | **Hierarchical AGENTS.md**
+> **62 skills** | **6 workflows** | **6 languages supported** | **Starlark execution policies** | **Hierarchical AGENTS.md**
 
 ---
 
@@ -45,7 +45,7 @@ everything-codex/
 |-- config.toml            # Codex CLI configuration with profiles + MCP servers
 |-- llms.txt               # Machine-readable project context for AI tools
 |
-|-- skills/                # 61 skills (workflow definitions + domain knowledge)
+|-- skills/                # 62 skills (workflow definitions + domain knowledge)
 |   |-- plan/                     # Implementation planning
 |   |-- tdd/                      # Test-driven development
 |   |-- code-review/              # Quality and security review
@@ -79,6 +79,7 @@ everything-codex/
 |   |-- continuous-learning-v2/   # Instinct-based learning system
 |   |-- strategic-compact/        # Session management strategies
 |   |-- iterative-retrieval/      # Progressive context refinement
+|   |-- document-processing/      # Document parsing + extraction workflows
 |   |-- coding-standards/         # TypeScript/JavaScript patterns
 |   |-- backend-patterns/         # API and database patterns
 |   |-- frontend-patterns/        # React/Next.js patterns
@@ -349,7 +350,7 @@ cd everything-codex
 The installer:
 - Backs up existing `~/.codex/` and `~/.agents/skills/` before changes
 - Offers merge strategies for existing AGENTS.md (append/include/replace/skip/dry-run)
-- Copies 61 skills to `~/.agents/skills/`
+- Copies 62 skills to `~/.agents/skills/`
 - Copies execution policies to `~/.codex/rules/`
 - Copies workflow playbooks to `~/.codex/workflows/`
 - Copies prompt templates to `~/.codex/prompts/`

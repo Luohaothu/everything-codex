@@ -132,6 +132,20 @@ const SCENARIOS = Object.freeze({
     domainKeywords: [],
     smoke: true,
   }),
+  'scenario-10-document-processing': createScenario({
+    id: '10',
+    key: 'scenario-10-document-processing',
+    title: 'DocumentProcessing',
+    analysisType: 'planning',
+    hasFixture: false,
+    fixture: null,
+    anchorSkills: ['plan', 'document-processing'],
+    optionalSkills: ['iterative-retrieval', 'security-review', 'architect'],
+    // Keep action tokens short so substring matching is robust to filler words.
+    expectedActions: ['extraction schema', 'processing pipeline', 'edge cases'],
+    domainKeywords: [],
+    smoke: true,
+  }),
 });
 
 function getScenarioConfig(scenarioKey) {
