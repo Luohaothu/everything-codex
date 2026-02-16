@@ -49,7 +49,7 @@ Use interactive prompts to let the user choose:
 
 ```bash
 # Skills install to ~/.codex/skills/ (user-level) or .codex/skills/ (project-level)
-SKILLS_DIR="$HOME/.agents/skills"  # or .agents/skills for project-level
+SKILLS_DIR="$HOME/.codex/skills"  # or .codex/skills for project-level
 for skill_dir in $ECX_ROOT/skills/*/; do
     skill_name=$(basename "$skill_dir")
     mkdir -p "$SKILLS_DIR/$skill_name"
