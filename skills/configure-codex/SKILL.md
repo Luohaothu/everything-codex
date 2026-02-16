@@ -17,7 +17,7 @@ An interactive, step-by-step installation guide for the everything-codex project
 
 ```bash
 rm -rf /tmp/everything-codex
-git clone https://github.com/anthropics/everything-codex.git /tmp/everything-codex
+git clone https://github.com/Luohaothu/everything-codex.git /tmp/everything-codex
 ```
 
 Set `ECX_ROOT=/tmp/everything-codex` as the source for all subsequent operations.
@@ -27,8 +27,8 @@ Set `ECX_ROOT=/tmp/everything-codex` as the source for all subsequent operations
 ## Step 1: Choose Installation Level
 
 Ask the user where to install:
-- **User-level** (`~/.codex/` for config, `~/.agents/skills/` for skills) — Applies to all projects
-- **Project-level** (`.agents/skills/` in project root) — Applies to current project only
+- **User-level** (`~/.codex/` for config, `~/.codex/skills/` for skills) — Applies to all projects
+- **Project-level** (`.codex/skills/` in project root) — Applies to current project only
 
 ---
 
@@ -48,8 +48,8 @@ Use interactive prompts to let the user choose:
 ### Execute Installation
 
 ```bash
-# Skills install to ~/.agents/skills/ (user-level) or .agents/skills/ (project-level)
-SKILLS_DIR="$HOME/.agents/skills"  # or .agents/skills for project-level
+# Skills install to ~/.codex/skills/ (user-level) or .codex/skills/ (project-level)
+SKILLS_DIR="$HOME/.codex/skills"  # or .codex/skills for project-level
 for skill_dir in $ECX_ROOT/skills/*/; do
     skill_name=$(basename "$skill_dir")
     mkdir -p "$SKILLS_DIR/$skill_name"
@@ -93,7 +93,7 @@ cp $ECX_ROOT/rules/*.rules ~/.codex/rules/
 ## Installation Complete
 
 ### Skills Installed ([count])
-Location: ~/.agents/skills/
+Location: ~/.codex/skills/
 
 ### AGENTS.md Installed
 - ~/.codex/AGENTS.md
@@ -119,7 +119,7 @@ rm -rf /tmp/everything-codex
 ## Troubleshooting
 
 ### "Skills not being picked up"
-- Verify `~/.agents/skills/<name>/SKILL.md` exists
+- Verify `~/.codex/skills/<name>/SKILL.md` exists
 - Check that SKILL.md has YAML frontmatter with `name` and `description`
 
 ### "Rules not working"
