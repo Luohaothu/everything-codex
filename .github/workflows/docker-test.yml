@@ -70,15 +70,43 @@ jobs:
       - name: Build test container
         run: docker compose -f tests/docker/docker-compose.yml build --build-arg TESTUSER_UID=$(id -u) --build-arg TESTUSER_GID=$(id -g)
 
-      - name: Run smoke tests (fallback to lifecycle baseline when API secrets are absent)
+      - name: Select smoke test layer
+        id: smoke-layer
+        shell: bash
         run: |
-          if [ -n "${CODEX_API_KEY:-}" ] || [ -n "${OPENAI_API_KEY:-}" ]; then
-            echo "API secrets detected. Running smoke suite (static + lifecycle + smoke integration)."
-            docker compose -f tests/docker/docker-compose.yml run --rm test-runner smoke
-          else
-            echo "API secrets are absent for this run. Falling back to lifecycle baseline (static + lifecycle)."
-            docker compose -f tests/docker/docker-compose.yml run --rm test-runner lifecycle
-          fi
+          set +e
+          docker compose -f tests/docker/docker-compose.yml run --rm --entrypoint node test-runner /workspace/tests/docker/check-api-credentials.js
+          status=$?
+          set -e
+
+          case "$status" in
+            0)
+              echo "API preflight succeeded. Running smoke suite (static + lifecycle + smoke integration)."
+              echo "layer=smoke" >> "$GITHUB_OUTPUT"
+              ;;
+            10)
+              echo "::warning::API secrets are absent for this run. Falling back to lifecycle baseline."
+              echo "layer=lifecycle" >> "$GITHUB_OUTPUT"
+              ;;
+            20)
+              echo "::warning::API credentials were rejected during preflight. Falling back to lifecycle baseline. Rotate CODEX_API_KEY or OPENAI_API_KEY."
+              echo "layer=lifecycle" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "::error::API preflight failed unexpectedly with exit code $status."
+              exit "$status"
+              ;;
+          esac
+        env:
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          CODEX_TEST_MODEL: ${{ vars.CODEX_TEST_MODEL || 'gpt-5.3-codex' }}
+          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || 'medium' }}
+          CODEX_TEST_TIMEOUT: ${{ vars.CODEX_TEST_TIMEOUT || '180' }}
+
+      - name: Run selected smoke test layer
+        run: docker compose -f tests/docker/docker-compose.yml run --rm test-runner ${{ steps.smoke-layer.outputs.layer }}
         env:
           CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -107,8 +135,53 @@ jobs:
       - name: Build test container
         run: docker compose -f tests/docker/docker-compose.yml build --build-arg TESTUSER_UID=$(id -u) --build-arg TESTUSER_GID=$(id -g)
 
-      - name: Run full tests
-        run: docker compose -f tests/docker/docker-compose.yml run --rm test-runner ${{ inputs.test_layer || 'all' }}
+      - name: Select full test layer
+        id: full-layer
+        shell: bash
+        run: |
+          requested_layer="${{ inputs.test_layer || 'all' }}"
+
+          case "$requested_layer" in
+            static|layer1|layer1/static|lifecycle|layer2|layer2/lifecycle)
+              echo "Requested layer '$requested_layer' does not require API preflight."
+              echo "layer=$requested_layer" >> "$GITHUB_OUTPUT"
+              exit 0
+              ;;
+          esac
+
+          set +e
+          docker compose -f tests/docker/docker-compose.yml run --rm --entrypoint node test-runner /workspace/tests/docker/check-api-credentials.js
+          status=$?
+          set -e
+
+          case "$status" in
+            0)
+              echo "API preflight succeeded. Running requested layer '$requested_layer'."
+              echo "layer=$requested_layer" >> "$GITHUB_OUTPUT"
+              ;;
+            10)
+              echo "::warning::API secrets are absent for this run. Falling back to lifecycle baseline."
+              echo "layer=lifecycle" >> "$GITHUB_OUTPUT"
+              ;;
+            20)
+              echo "::warning::API credentials were rejected during preflight. Falling back to lifecycle baseline. Rotate CODEX_API_KEY or OPENAI_API_KEY."
+              echo "layer=lifecycle" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "::error::API preflight failed unexpectedly with exit code $status."
+              exit "$status"
+              ;;
+          esac
+        env:
+          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_BASE_URL: ${{ secrets.OPENAI_BASE_URL }}
+          CODEX_TEST_MODEL: ${{ vars.CODEX_TEST_MODEL || 'gpt-5.3-codex' }}
+          CODEX_TEST_REASONING_EFFORT: ${{ vars.CODEX_TEST_REASONING_EFFORT || 'medium' }}
+          CODEX_TEST_TIMEOUT: ${{ vars.CODEX_TEST_TIMEOUT || '180' }}
+
+      - name: Run selected full test layer
+        run: docker compose -f tests/docker/docker-compose.yml run --rm test-runner ${{ steps.full-layer.outputs.layer }}
         env:
           CODEX_API_KEY: ${{ secrets.CODEX_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

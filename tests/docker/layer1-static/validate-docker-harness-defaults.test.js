@@ -18,6 +18,8 @@ const COMPOSE_PATH = path.join(WORKSPACE, 'tests/docker/docker-compose.yml');
 const CODEX_HELPER_PATH = path.join(WORKSPACE, 'tests/docker/lib/codex-helper.js');
 const CODEX_CONFIG_PATH = path.join(WORKSPACE, 'tests/docker/config/codex-config.toml');
 const ENTRYPOINT_PATH = path.join(WORKSPACE, 'tests/docker/entrypoint.sh');
+const DOCKER_WORKFLOW_PATH = path.join(WORKSPACE, '.github/workflows/docker-test.yml');
+const AUTH_PREFLIGHT_PATH = path.join(WORKSPACE, 'tests/docker/check-api-credentials.js');
 
 const suite = createSuite('Validate Docker Harness Defaults');
 
@@ -52,4 +54,12 @@ suite.test('entrypoint prints consistent defaults', () => {
   fileContains(ENTRYPOINT_PATH, /Timeout: \$\{CODEX_TEST_TIMEOUT:-180\}s/);
 });
 
+suite.test('docker workflow uses API preflight before layer3 jobs', () => {
+  fileContains(DOCKER_WORKFLOW_PATH, /tests\/docker\/check-api-credentials\.js/);
+  fileContains(DOCKER_WORKFLOW_PATH, /Falling back to lifecycle baseline/);
+});
+
+suite.test('API preflight script exists in docker harness', () => {
+  fileContains(AUTH_PREFLIGHT_PATH, /codexExec\(/);
+});
 runAndExit(suite);
