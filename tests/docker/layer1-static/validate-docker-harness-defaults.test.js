@@ -56,7 +56,8 @@ suite.test('entrypoint prints consistent defaults', () => {
 
 suite.test('docker workflow uses API preflight before layer3 jobs', () => {
   fileContains(DOCKER_WORKFLOW_PATH, /tests\/docker\/check-api-credentials\.js/);
-  fileContains(DOCKER_WORKFLOW_PATH, /Falling back to lifecycle baseline/);
+  fileContains(DOCKER_WORKFLOW_PATH, /echo "layer=lifecycle" >> "\$GITHUB_OUTPUT"/);
+  fileContains(DOCKER_WORKFLOW_PATH, /case "\$status" in[\s\S]*10\)[\s\S]*20\)/);
 });
 
 suite.test('API preflight script exists in docker harness', () => {

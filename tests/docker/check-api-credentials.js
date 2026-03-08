@@ -3,7 +3,6 @@
 const {
   codexExec,
   isAuthenticationFailureSignal,
-  resolveWorkspaceRoot,
 } = require('./lib/codex-helper');
 
 const EXIT_CODES = Object.freeze({
@@ -37,7 +36,7 @@ function main() {
   }
 
   const result = codexExec('Reply exactly with OK.', {
-    cwd: resolveWorkspaceRoot(),
+    cwd: process.env.HOME || '/tmp',
     timeout: 30_000,
     outputSchema: '',
     scenarioId: 'api-auth-preflight',
