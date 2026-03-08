@@ -105,6 +105,15 @@ function isRateLimitSignal(resultOrError) {
   return /(^|\W)429(\W|$)|rate.limit|rate_limit|rate limit|too many requests/.test(corpus);
 }
 
+function isAuthenticationFailureSignal(resultOrError) {
+  const corpus = asLowerCorpus(resultOrError);
+  if (!corpus) {
+    return false;
+  }
+
+  return /(^|\W)401(\W|$)|unauthorized|authentication[_\s-]?error|invalid[_\s-]?(?:api[_\s-]?)?(?:key|token)|expired[_\s-]?token|token(?:\s+is|\s+has been|\s+was)?\s+expired|access token.*expired|该令牌已过期/.test(corpus);
+}
+
 function isEmptyDiagnosticFailureSignal(result) {
   if (!result || typeof result !== 'object' || result.exitCode === 0) {
     return false;
@@ -472,6 +481,7 @@ function withRetry(fn, options = {}) {
 module.exports = {
   codexExec,
   hasError,
+  isAuthenticationFailureSignal,
   outputContainsAny,
   outputContainsAll,
   withRetry,

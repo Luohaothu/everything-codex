@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
-const { withRetry } = require('../../lib/codex-helper');
+const { isAuthenticationFailureSignal, withRetry } = require('../../lib/codex-helper');
 const { assertScenario, extractTraceEvidence } = require('../../lib/assertions');
 
 function makeTempDir(prefix) {
@@ -251,8 +251,59 @@ function runRetryContracts() {
   );
 }
 
+function runAuthenticationSignalContracts() {
+  assert.strictEqual(
+    isAuthenticationFailureSignal({
+      exitCode: 1,
+      stderr: 'HTTP 401 Unauthorized: token has expired',
+      output: '',
+      lines: [],
+      events: [],
+    }),
+    true,
+    '401 expired-token errors should be classified as authentication failures'
+  );
+
+  assert.strictEqual(
+    isAuthenticationFailureSignal({
+      exitCode: 1,
+      stderr: 'error=http 401 Unauthorized: 该令牌已过期',
+      output: '',
+      lines: [],
+      events: [],
+    }),
+    true,
+    'localized expired-token errors should be classified as authentication failures'
+  );
+
+  assert.strictEqual(
+    isAuthenticationFailureSignal({
+      exitCode: 1,
+      stderr: 'HTTP 429 insufficient_quota',
+      output: '',
+      lines: [],
+      events: [],
+    }),
+    false,
+    'quota errors must not be misclassified as authentication failures'
+  );
+
+  assert.strictEqual(
+    isAuthenticationFailureSignal({
+      exitCode: 1,
+      stderr: 'failed to parse output schema',
+      output: '',
+      lines: [],
+      events: [],
+    }),
+    false,
+    'generic deterministic failures must not be treated as auth failures'
+  );
+}
+
 runAssertScenarioContract();
 runTraceExtractionContract();
 runRetryContracts();
+runAuthenticationSignalContracts();
 
 console.log('contract-check: PASS');
